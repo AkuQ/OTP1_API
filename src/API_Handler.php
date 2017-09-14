@@ -43,27 +43,27 @@ class API_Handler
             $class = get_class($instance);
             $method = $func[1];
             $method_reflection = new \ReflectionMethod($class, $method);
-            $params = $method_reflection->getParameters();
+            $reflection_params = $method_reflection->getParameters();
         }
         else {
             $func_reflection = new \ReflectionFunction($func);
-            $params = $func_reflection->getParameters();
+            $reflection_params = $func_reflection->getParameters();
         }
 
         $missing_parameters = [];
         $params_ordered = [];
-        foreach($params as $p) {
+        foreach($reflection_params as $p) {
             $name = $p->getName();
-            $value = null;
 
-            if (!isset($params_unordered[$name])) {
-                if ($p->isOptional()) {
-                    $value = $p->getDefaultValue();
-                } else {
-                    $missing_parameters[] = $name;
-                }
-            } else {
+            if (isset($params_unordered[$name])) {
                 $value = $params_unordered[$name];
+            }
+            else if ($p->isOptional()) {
+                $value = $p->getDefaultValue();
+            }
+            else {
+                $missing_parameters[] = $name;
+                $value = null;
             }
             $params_ordered[$name] = $value;
         }
