@@ -80,13 +80,13 @@ class API_HandlerTest extends PHPUnit_Framework_TestCase
         $params->method('all')->willReturn( ['a' => 'Print', 'b' => 'in', 'c' => 'this', 'd' => 'order']);
         $request->request = $params;
 
-        $expected = '["Print","in","this","order"]';
+        $expected = '{"result":["Print","in","this","order"]}';
         $actual = $handler->respond($request, function ($a, $b, $c, $d){
             return  [$a, $b, $c, $d,];
         });
         self::assertEquals($expected, $actual);
 
-        $expected = '{"a":"Print","b":"in","c":"this","d":"order"}';
+        $expected = '{"result":{"a":"Print","b":"in","c":"this","d":"order"}}';
         $actual = $handler->respond($request, function ($a, $b, $c, $d){
             return  ['a' => $a, 'b' => $b, 'c' => $c, 'd' => $d,];
         });

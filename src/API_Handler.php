@@ -74,12 +74,10 @@ class API_Handler
 
         $ret = call_user_func_array($func, $params_ordered);
 
-        if (is_object($ret)){
+        if (is_object($ret)){  #todo: check for objects recursively
             throw new Exception("Cannot return object");
         }
-        elseif(!is_array($ret)){
-            $ret =  ['result' => $ret];
-        }
+        $ret =  ['result' => $ret];
         return json_encode($ret);
     }
 
