@@ -9,7 +9,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class API_HandlerTest extends PHPUnit_Framework_TestCase
 {
-
     public function test_throw_error_if_request_content_is_not_json(){
         $handler = new API_Handler();
 
@@ -33,7 +32,6 @@ class API_HandlerTest extends PHPUnit_Framework_TestCase
         /** @var Request $request */
 
         $handler->parse_request($request);
-
         self::assertEmpty($request->request->all());
     }
 
@@ -45,7 +43,6 @@ class API_HandlerTest extends PHPUnit_Framework_TestCase
             ->getMock();
         $request->method('getContent')->willReturn('{"this":1, "is":"a", "json":[1,2,3]}');
         /** @var Request $request */
-
 
         $expected = [
             "this" => 1,
@@ -70,7 +67,6 @@ class API_HandlerTest extends PHPUnit_Framework_TestCase
         $actual = $handler->respond($request, function ($a, $b, $c, $d){
             return  "$a $b $c $d";
         });
-
         self::assertEquals($expected, $actual);
     }
 
@@ -111,7 +107,6 @@ class API_HandlerTest extends PHPUnit_Framework_TestCase
         $actual = $handler->respond($request, function ($a, $b, $c, $d){
             return  "$a $b $c $d";
         });
-
         self::assertEquals($expected, $actual);
     }
 
@@ -129,7 +124,6 @@ class API_HandlerTest extends PHPUnit_Framework_TestCase
         $actual = $handler->respond($request, function ($a, $b, $c, $d='order'){
             return  "$a $b $c $d";
         });
-
         self::assertEquals($expected, $actual);
     }
 
@@ -147,7 +141,6 @@ class API_HandlerTest extends PHPUnit_Framework_TestCase
         $actual = $handler->respond($request, function ($a, $b, $c, $d = 'order') {
             return "$a $b $c $d";
         });
-
         self::assertEquals($expected, $actual);
     }
 
@@ -167,10 +160,12 @@ class API_HandlerTest extends PHPUnit_Framework_TestCase
         });
     }
 
-
     public function test_calls_class_method() {
         $handler = new API_Handler();
 
+        eval('class TestClass {public function foo($a, $b, $c, $d="order"){return  "$a $b $c $d";}}');
+        /** @noinspection PhpUndefinedClassInspection */
+        $instance = new TestClass();
 
         $request = new Request();
         $params = self::getMockBuilder(ParameterBag::class)
@@ -180,12 +175,8 @@ class API_HandlerTest extends PHPUnit_Framework_TestCase
         $request->request = $params;
 
         $expected = '{"result":"Print in this order"}';
-        $instance = new TestClass();
         $actual = $handler->respond($request, [$instance, 'foo']);
-
         self::assertEquals($expected, $actual);
     }
 }
 
-
-class TestClass {public function foo($a, $b, $c, $d="order"){return  "$a $b $c $d";}}
