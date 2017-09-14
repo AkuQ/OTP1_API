@@ -18,7 +18,15 @@ class API_Handler
     }
 
     public function parse_request(Request $request) {
-        $data = json_decode($request->getContent(), true);;
+        $content = $request->getContent();
+
+        if (!$content) {
+            $data = [];
+        }
+        else {
+            $data = json_decode($content, true);
+        }
+
         if ($data === null) {
             throw new Exception("Bad JSON");
         }
@@ -30,11 +38,17 @@ class API_Handler
     public function respond(Request $request, callable $func) {
         $params_unordered = $request->request->all();
 
-        $instance = $func[0];
-        $class = get_class($instance);
-        $method = $func[1];
-        $method_reflection = new \ReflectionMethod($class, $method);
-        $params = $method_reflection->getParameters();
+        if (is_array($func)) {
+            $instance = $func[0];
+            $class = get_class($instance);
+            $method = $func[1];
+            $method_reflection = new \ReflectionMethod($class, $method);
+            $params = $method_reflection->getParameters();
+        }
+        else {
+            $func_reflection = new \ReflectionFunction($func);
+            $params = $func_reflection->getParameters();
+        }
 
         $missing_parameters = [];
         $params_ordered = [];
