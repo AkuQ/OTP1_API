@@ -1,28 +1,28 @@
+
+
 POST       /get_time
 HEADER    Content-Type:application/json
 REQUEST   {}
-RESPONSE  {"result": <string>}
+RESPONSE  "result": <string>
   result: timestring in format Y-m-d H:i:s
   
 POST       /users/create
 HEADER    Content-Type:application/json
 REQUEST   {"name": <string>}
    name: user's screen name
-RESPONSE  {"id": <int>, "token": <string>}
+RESPONSE  "result": {"id": <int>, "token": <string>}
   id: user's ID
   token: user's authentication token
   
 POST      /rooms/list
 HEADER    Content-Type:application/json
 REQUEST   {}
-RESPONSE  
-          {
-            "result": 
-              [{
-                "id": <int>
-                "name": <string>
-              }]
-          }
+RESPONSE
+        "result":
+          [{
+            "id": <int>
+            "name": <string>
+          }]
   id: chat rooms's ID
   name: chat rooms's display name
   
@@ -31,6 +31,6 @@ HEADER    Content-Type:application/json
 REQUEST   {"name": <string>, "password": <string>}
   name: chat room's display name
   password: chat room's password
-RESPONSE  {"id": <int>}
+RESPONSE  "result": {"id": <int>}
   id: chat rooms's ID
   
