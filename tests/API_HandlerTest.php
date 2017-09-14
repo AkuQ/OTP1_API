@@ -166,4 +166,26 @@ class API_HandlerTest extends PHPUnit_Framework_TestCase
             return "$a $b $c $d";
         });
     }
+
+
+    public function test_calls_class_method() {
+        $handler = new API_Handler();
+
+
+        $request = new Request();
+        $params = self::getMockBuilder(ParameterBag::class)
+            ->setMethods(['all'])
+            ->getMock();
+        $params->method('all')->willReturn( ['b' => 'in', 'a' => 'Print', 'c' => 'this',]);
+        $request->request = $params;
+
+        $expected = '{"result":"Print in this order"}';
+        $instance = new TestClass();
+        $actual = $handler->respond($request, [$instance, 'foo']);
+
+        self::assertEquals($expected, $actual);
+    }
 }
+
+
+class TestClass {public function foo($a, $b, $c, $d="order"){return  "$a $b $c $d";}}

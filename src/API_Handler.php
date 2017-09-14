@@ -38,7 +38,7 @@ class API_Handler
     public function respond(Request $request, callable $func) {
         $params_unordered = $request->request->all();
 
-        if (!is_callable($func)) {
+        if (is_array($func)) {
             $instance = $func[0];
             $class = get_class($instance);
             $method = $func[1];
