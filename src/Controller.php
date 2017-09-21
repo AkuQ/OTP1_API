@@ -1,18 +1,7 @@
 <?php
 namespace StormChat;
 
-function remap_keys(array $array, array $keys) {
-    $ret = [];
-    foreach ($keys as $from => $to) {
-        if(is_int($from)) {
-            $from = $to;
-        }
-        foreach($array as $i => $row) {
-            $ret[$i][$to] = $row[$from];
-        }
-    }
-    return $ret;
-}
+
 
 class Controller {
     function __construct(DB_Handler $db) {
