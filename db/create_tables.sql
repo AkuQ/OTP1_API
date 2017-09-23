@@ -12,6 +12,7 @@ CREATE TABLE `message` (
 	`message_id` bigint NOT NULL,
 	`user_id` bigint NOT NULL,
 	`content` varchar(256) NOT NULL,
+	`created` DATETIME NOT NULL,
 	PRIMARY KEY (`chat_id`,`message_id`)
 );
 
@@ -21,6 +22,7 @@ CREATE TABLE `user` (
 	`token` varchar(256) NOT NULL,
 	`chat_id` bigint,
 	`created` DATETIME NOT NULL,
+	`updated` DATETIME NOT NULL,
 	PRIMARY KEY (`user_id`)
 );
 
@@ -34,6 +36,7 @@ CREATE TABLE `workspace_line` (
 	`line_id` bigint NOT NULL,
 	`workspace_id` bigint NOT NULL,
 	`content` varchar(256) NOT NULL,
+	`line_no` bigint NOT NULL,
 	PRIMARY KEY (`line_id`,`workspace_id`)
 );
 
