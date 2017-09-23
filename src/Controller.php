@@ -1,63 +1,37 @@
 <?php
 namespace StormChat;
 
+function remap_keys(array $array, array $keys) {
+    $ret = [];
+    foreach ($keys as $from => $to) {
+        if(is_int($from)) {
+            $from = $to;
+        }
+        foreach($array as $i => $row) {
+            $ret[$i][$to] = $row[$from];
+        }
+    }
+    return $ret;
+}
+
 class Controller {
-
-    function get_groups() {
-        $date = getdate();
-        $year = $date['year'];
-        $month = $date['mon'];
-        $day = $date['mday'];
-        $connection = DB_Handler.get_connection();
-       // handler->selec(table, [col1, col2], "col1 > 0 AND col2 = 0")
-
-        $sql = "SELECT chat_id 
-        FROM chat WHERE created BETWEEN '$year-$month-$day 23:59:59' AND '$year-".($month - 1)."-$day 00:00:00'";
-
-        //$result = $connection->query($sql);
-        $result = DB_Handler.select($sql);
-        $chat_ids = [];
-        while ($row = $result->fetch_assoc()) {
-            array_push($chat_ids, $row["chat_id"]);
-        }
-        $connection = close();
-        return $chat_ids;
+    function __construct(DB_Handler $db) {
+        $this->db_handler = $db;
     }
 
-    function create_user($name, $password) {
-        //palauta id ja token (tehty)
-
-        $connection = DB_Handler.get_connection();
-        $created = date("Y-m-d h:i:s");
-        $sql = $connection->prepare("INSERT INTO user (name, token, created) VALUES (?, ?, ?)");
-        $sql->bind_param("ssis", $name, $token, $created);
-        $sql->execute();
-        $connection->close();
+    function create_user($name){
+        $token = openssl_random_pseudo_bytes(128);
+        $user_id = $this->db_handler->create_user($name, $token);
+        return ['id' => $user_id, 'token' => $token];
     }
 
-    function get_messages($user_id, $chat_id) {
-        $connection = DB_Handler.get_connection();
-        $sql = "SELECT content 
-        FROM message WHERE user_id='$user_id' AND chat_id='$chat_id'";
-
-        $messages = [];
-        $result = $connection->query($sql);
-        while ($row = $result->fetch_assoc()) {
-            array_push($messages, $row["content"]);
-        }
-
-        $connection->close();
-        return $messages;
+    function list_rooms() {
+        $rooms = $this->db_handler->get_groups();
+        return remap_keys($rooms, ['name', 'chat_id' => 'id']);
     }
 
-    function post_message($user_id, $chat_id, $message) {
-        $connection = DB_handler.get_connection();
-        $created = date("Y-m-d h:i:s");
-        $sql = $connection->prepare("INSERT INTO message (chat_id, user_id, content, created) VALUES (?, ?, ?, ?)");
-        $sql->bind_param("iiss", $chat_id, $user_id, $message, $created);
-        $sql->execute();
-
-        $connection->close();
-
+    function create_room($name, $password){
+        $room_id = $this->db_handler->create_group($name, $password);
+        return $room_id;
     }
 }

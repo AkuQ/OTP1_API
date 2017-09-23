@@ -18,7 +18,15 @@ class API_Handler
     }
 
     public function parse_request(Request $request) {
-        $data = json_decode($request->getContent(), true);;
+        $content = $request->getContent();
+
+        if (!$content) {
+            $data = [];
+        }
+        else {
+            $data = json_decode($content, true);
+        }
+
         if ($data === null) {
             throw new Exception("Bad JSON");
         }
@@ -30,26 +38,32 @@ class API_Handler
     public function respond(Request $request, callable $func) {
         $params_unordered = $request->request->all();
 
-        $instance = $func[0];
-        $class = get_class($instance);
-        $method = $func[1];
-        $method_reflection = new \ReflectionMethod($class, $method);
-        $params = $method_reflection->getParameters();
+        if (is_array($func)) {
+            $instance = $func[0];
+            $class = get_class($instance);
+            $method = $func[1];
+            $method_reflection = new \ReflectionMethod($class, $method);
+            $reflection_params = $method_reflection->getParameters();
+        }
+        else {
+            $func_reflection = new \ReflectionFunction($func);
+            $reflection_params = $func_reflection->getParameters();
+        }
 
         $missing_parameters = [];
         $params_ordered = [];
-        foreach($params as $p) {
+        foreach($reflection_params as $p) {
             $name = $p->getName();
-            $value = null;
 
-            if (!isset($params_unordered[$name])) {
-                if ($p->isOptional()) {
-                    $value = $p->getDefaultValue();
-                } else {
-                    $missing_parameters[] = $name;
-                }
-            } else {
+            if (isset($params_unordered[$name])) {
                 $value = $params_unordered[$name];
+            }
+            else if ($p->isOptional()) {
+                $value = $p->getDefaultValue();
+            }
+            else {
+                $missing_parameters[] = $name;
+                $value = null;
             }
             $params_ordered[$name] = $value;
         }
@@ -60,12 +74,10 @@ class API_Handler
 
         $ret = call_user_func_array($func, $params_ordered);
 
-        if (is_object($ret)){
+        if (is_object($ret)){  #todo: check for objects recursively
             throw new Exception("Cannot return object");
         }
-        elseif(!is_array($ret)){
-            $ret =  ['result' => $ret];
-        }
+        $ret =  ['result' => $ret];
         return json_encode($ret);
     }
 
