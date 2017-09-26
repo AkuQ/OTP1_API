@@ -14,16 +14,12 @@ $app = new Silex\Application();
 
 # SERVICES:
 
-$app->register(new Silex\Provider\TwigServiceProvider(), [
-    'twig.path' => __DIR__ . '/views',
-]);
-
 $app['api_handler'] = function () {
     return new API_Handler();
 };
 
 $app['controller'] = function () {
-    return new Controller(new DB_Handler());  # todo: db handler config-file location / parameter
+    return new Controller(new DB_Handler(__DIR__ . '/src/pass.txt'));
 };
 
 
@@ -48,11 +44,6 @@ $app->get('/', function () {
 
 $app->post('/', function () {
     return "StormChat API";
-});
-
-$app->get('/doc', function (Request $request) use ($app) {
-    $docs = $app['api_handler']->get_docs();
-    return $app['twig']->render('doc.twig', ['docs' => $docs]);
 });
 
 $app->post('/get_time', function (Request $request) use ($app) {
