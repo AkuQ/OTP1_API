@@ -36,9 +36,6 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
         foreach ($sql as $item) {
             self::$connection->query($item);
         }
-
-
-
     }
 
     function setUp()
@@ -52,7 +49,6 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
         self::$connection->query("TRUNCATE workspace_line");
         self::$connection->query("TRUNCATE line_lock");
         self::$connection->query("SET FOREIGN_KEY_CHECKS = 1");
-
     }
 
     static function tearDownAfterClass()
@@ -73,12 +69,10 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($groups));
         $this->assertEquals("ryhma1", $groups[0]["name"]);
         $this->assertEquals(1, $groups[0]["chat_id"]);
-
     }
 
     public function testCreateUser()
     {
-
         $return = self::$handler->create_user("arto");
         $result = self::$connection->query("SELECT * FROM user");
         $row = $result->fetch_assoc();
@@ -87,9 +81,6 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($return["id"], $row["user_id"]);
         $this->assertEquals(date("null"), $row["created"]);
         $this->assertEquals(date("null"), $row["updated"]);
-
-
-
     }
 
     public function testCreateGroup()
@@ -111,14 +102,52 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($pass_two, $row["password"]);
         $this->assertEquals(date("null"), $row["created"]);
         $this->assertEquals(date("null"), $row["updated"]);
-
     }
 
     public function testJoinChat() {
+        global $get_date_return;
+        self::$handler->create_group("ryhmaa", "pw1");
+        $get_date_return["year"] = "1800";
+        $return = self::$handler->create_user("arto");
+        $get_date_return["year"] = "2000";
+        $bool = self::$handler->join_chat(1, $return["id"], "pw1");
+        $this->assertEquals(true, $bool);
+        $result = self::$connection->query("SELECT * FROM user WHERE name='arto'");
+        $row = $result->fetch_assoc();
+        $get_date_return["year"] = "1800";
+        $this->assertEquals(date(null), $row["created"]);
+        $get_date_return["year"] = "2000";
+        $this->assertEquals(date(null), $row["updated"]);
+        $this->assertEquals(1, $row["chat_id"]);
+        $this->assertEquals(false, self::$handler->join_chat(1, $return["id"], "pw2"));
+    }
+
+    public function testPostMessage() {
+
         self::$handler->create_group("ryhmaa", "pw1");
         $return = self::$handler->create_user("arto");
-        $bool = self::$handler->join_chat(0, $return["id"], "pw1");
-        $this->assertEquals("true", $bool);
+        $bool = self::$handler->join_chat(1, $return["id"], "pw1");
+        self::$handler->post_message(1, 1, "Hello world");
+        self::$handler->post_message(1, 1, "dlrow elloH");
+        $result = self::$connection->query("SELECT * FROM message");
+        $row = $result->fetch_assoc();
+        $this->assertEquals(date(null), $row["created"]);
+        $this->assertEquals(1, $row["chat_id"]);
+        $this->assertEquals(1, $row["message_id"]);
+        $this->assertEquals(1, $row["user_id"]);
+        $this->assertEquals("Hello world", $row["content"]);
+
+        $row = $result->fetch_assoc();
+        $this->assertEquals(date(null), $row["created"]);
+        $this->assertEquals(1, $row["chat_id"]);
+        $this->assertEquals(2, $row["message_id"]);
+        $this->assertEquals(1, $row["user_id"]);
+        $this->assertEquals("dlrow elloH", $row["content"]);
+
+
+    }
+
+    public function testGetChatUsers() {
 
     }
 
