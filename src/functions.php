@@ -2,6 +2,14 @@
 
 namespace StormChat;
 
+
+/** Pick and remap keys from array.
+ *
+ * @param array $array Source array.
+ * @param array $key_map Indexed items are keys that will be picked, associative are mapped source_key => dest_key
+ *
+ * @return array
+ */
 function remap_keys(array $array, array $key_map) {
     $ret = [];
 
