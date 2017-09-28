@@ -73,8 +73,7 @@ class DB_Handler {
         $connection->close();
     }
 
-    function create_user($name) {
-        $token = openssl_random_pseudo_bytes(128);
+    function create_user($token, $name) {
         $connection = $this->connect();
         $created = date("Y-m-d H:i:s");
         $sql = $connection->prepare("INSERT INTO user (name, token, created, updated) VALUES (?, ?, ?, ?)");
@@ -82,8 +81,7 @@ class DB_Handler {
         $sql->execute();
         $id = $connection->insert_id;
         $connection->close();
-
-        return ["token" => $token, "id" => $id];
+        return $id;
     }
 
     function create_group($name, $password) {
@@ -93,8 +91,9 @@ class DB_Handler {
         $created = date("Y-m-d H:i:s");
         $sql->bind_param("ssss", $name, $hashed, $created, $created);
         $sql->execute();
+        $id = $connection->insert_id;
         $connection->close();
-
+        return $id;
     }
 
     function get_messages($since_message_id, $chat_id) {
