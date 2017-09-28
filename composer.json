@@ -3,6 +3,6 @@
     "silex/silex": "~2.0"
   },
   "autoload": {
-    "files": ["./tests/testdb.txt", "./src/pass.txt", "./tests/"]
+    "files": ["./tests/testdb.txt", "./src/pass.txt", "./tests/", "./db/ceate_tables.sql"]
   }
 }
