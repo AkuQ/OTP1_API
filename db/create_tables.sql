@@ -9,11 +9,11 @@ CREATE TABLE `chat` (
 
 CREATE TABLE `message` (
 	`chat_id` bigint NOT NULL,
-	`message_id` bigint NOT NULL,
+	`message_id` bigint NOT NULL AUTO_INCREMENT,
 	`user_id` bigint NOT NULL,
 	`content` varchar(256) NOT NULL,
 	`created` DATETIME NOT NULL,
-	PRIMARY KEY (`chat_id`,`message_id`)
+	PRIMARY KEY (`message_id`)
 );
 
 CREATE TABLE `user` (

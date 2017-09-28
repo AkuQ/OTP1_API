@@ -30,21 +30,19 @@ class DB_Handler {
         $month = $date['mon'];
         $day = $date['mday'];
         $connection = $this->connect();
-        $sql = "SELECT name 
-        FROM chat WHERE created BETWEEN '$year-".($month - 1)."-$day 23:59:59' AND  '$year-$month-$day 00:00:00'";
-
+        $sql = "SELECT * 
+        FROM chat WHERE created BETWEEN '$year-".($month - 1)."-$day 00:00:00' AND  '$year-$month-$day 23:59:59'";
         $groups = [];
         $result = $connection->query($sql);
-        echo $connection->error;
-        var_dump($result);
         while ($row = $result->fetch_assoc()) {
             $groups[] = $row;
         }
         $connection->close();
-
         return $groups;
 
     }
+
+
 
     function join_chat($chat_id, $user_id, $password) {
 
@@ -52,13 +50,11 @@ class DB_Handler {
         $sql = "SELECT password FROM chat WHERE chat_id='$chat_id'";
         $hashed = hash('sha256', $password);
         $result = $connection->query($sql);
-        echo $result;
-        echo $connection->error;
+
         $row = $result->fetch_assoc();
-        echo $row["password"]." ".$hashed;
         if ($row["password"] === $hashed) {
             $updated = date("Y-m-d H:i:s");
-            $sql = "UPDATE user WHERE user_id='$user_id' SET chat_id='$chat_id', updated='$updated'";
+            $sql = "UPDATE user SET chat_id='$chat_id', updated='$updated' WHERE user_id='$user_id'";
             $connection->query($sql);
             $connection->close();
 
@@ -76,7 +72,6 @@ class DB_Handler {
         $sql = $connection->prepare("INSERT INTO user (name, token, created, updated) VALUES (?, ?, ?, ?)");
         $sql->bind_param("ssss", $name, $token, $created, $created);
         $sql->execute();
-        echo $sql->error;
         $id = $connection->insert_id;
         $connection->close();
 
@@ -98,13 +93,11 @@ class DB_Handler {
         $connection = $this->connect();
         $sql = "SELECT content 
         FROM message WHERE user_id='$user_id' AND chat_id='$chat_id'";
-
         $messages = [];
         $result = $connection->query($sql);
         while ($row = $result->fetch_assoc()) {
             array_push($messages, $row["content"]);
         }
-
         $connection->close();
         return $messages;
     }
@@ -115,7 +108,6 @@ class DB_Handler {
         $sql = $connection->prepare("INSERT INTO message (chat_id, user_id, content, created) VALUES (?, ?, ?, ?)");
         $sql->bind_param("iiss", $chat_id, $user_id, $message, $created);
         $sql->execute();
-
         $connection->close();
 
     }
