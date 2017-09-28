@@ -23,4 +23,20 @@ class Controller {
         $room_id = $this->db_handler->create_group($name, $password);
         return $room_id;
     }
+
+    function list_users($chat_id) {
+        $users = $this->db_handler->get_chat_users($chat_id);
+        return remap_keys($users, ['name', 'user_id' => 'id']);
+    }
+
+    function list_messages($chat_id, $since){
+        $messages = $this->db_handler->get_messages($since, $chat_id);
+        return remap_keys($messages, ['user_id', 'content' => 'message', 'message_id' => 'id']);
+    }
+
+    function post_message($user_id, $chat_id, $message) {
+        $message_id = $this->db_handler->post_message($user_id, $chat_id, $message);
+        return $message_id;
+    }
+
 }

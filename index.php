@@ -74,5 +74,26 @@ $app->post('/rooms/create', function (Request $request) use ($app) {
     );
 });
 
+$app->post('/users/list', function (Request $request) use ($app) {
+    return $app['api_handler']->respond(
+        $request,
+        [$app['controller'], 'list_users']
+    );
+});
+
+$app->post('/messages/list', function (Request $request) use ($app) {
+    return $app['api_handler']->respond(
+        $request,
+        [$app['controller'], 'list_messages']
+    );
+});
+
+$app->post('/messages/post', function (Request $request) use ($app) {
+    return $app['api_handler']->respond(
+        $request,
+        [$app['controller'], 'post_message']
+    );
+});
+
 
 $app->run();
