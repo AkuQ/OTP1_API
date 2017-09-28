@@ -1,22 +1,26 @@
 <?php
 
 namespace StormChat;
+
 use PHPUnit_Framework_TestCase;
-require_once __DIR__."/../src/autoload.php";
-$get_date_return = ['year' => 2000, 'mon' => 11, 'mday' => 11, 'h' => 23, 'i' => 40, 's' => 20 ];
+
+require_once __DIR__ . "/../src/autoload.php";
+$get_date_return = ['year' => 2000, 'mon' => 11, 'mday' => 11, 'h' => 23, 'i' => 40, 's' => 20];
 
 function getdate()
 {
     global $get_date_return;
     return $get_date_return;
 }
+
 function date($param)
 {
     global $get_date_return;
-    return $get_date_return['year']."-".$get_date_return['mon']."-".$get_date_return['mday']." ".
-        $get_date_return['h'].":".$get_date_return['i'].":".$get_date_return['s'];
+    return $get_date_return['year'] . "-" . $get_date_return['mon'] . "-" . $get_date_return['mday'] . " " .
+        $get_date_return['h'] . ":" . $get_date_return['i'] . ":" . $get_date_return['s'];
 
 }
+
 class DB_HandlerTest extends PHPUnit_Framework_TestCase
 {
     private static $connection = null;
@@ -25,9 +29,9 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
     static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        self::$handler = new DB_Handler(__DIR__."/testdb.txt");
+        self::$handler = new DB_Handler("testdb.php");
         self::$connection = self::$handler->connect();
-        $sql_create_tables = file_get_contents(__DIR__."/../db/create_tables.sql");
+        $sql_create_tables = file_get_contents("../db/create_tables.sql");
         $sql = explode(";", $sql_create_tables);
         self::$connection->query("SET FOREIGN_KEY_CHECKS = 0");
         self::$connection->query("DROP TABLE IF EXISTS chat, user, message, workspace, workspace_line, line_lock");
@@ -104,7 +108,8 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(date("null"), $row["updated"]);
     }
 
-    public function testJoinChat() {
+    public function testJoinChat()
+    {
         global $get_date_return;
         self::$handler->create_group("ryhmaa", "pw1");
         $get_date_return["year"] = "1800";
@@ -122,7 +127,8 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(false, self::$handler->join_chat(1, $return["id"], "pw2"));
     }
 
-    public function testPostMessage() {
+    public function testPostMessage()
+    {
 
         self::$handler->create_group("ryhmaa", "pw1");
         $return = self::$handler->create_user("randomtoken", "arto");
@@ -147,13 +153,14 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
 
     }
 
-    public function testGetChatUsers() {
+    public function testGetChatUsers()
+    {
         self::$handler->create_group("ryhmaa", "pw1");
 
         $return = self::$handler->create_user("randomtoken", "arto");
         self::$handler->join_chat(1, $return["id"], "pw1");
 
-        $return = self::$handler->create_user("randomtoken","tuomas");
+        $return = self::$handler->create_user("randomtoken", "tuomas");
         self::$handler->join_chat(1, $return["id"], "pw1");
 
         $return = self::$handler->create_user("randomtoken", "akseli");
@@ -171,7 +178,8 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
 
     }
 
-    public function testLeaveChat() {
+    public function testLeaveChat()
+    {
         self::$handler->create_group("ryhmaa", "pw1");
         $return = self::$handler->create_user("randomtoken", "arto");
         self::$handler->join_chat(1, $return["id"], "pw1");
@@ -182,7 +190,8 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(true, empty($users));
     }
 
-    public function testGetMessages() {
+    public function testGetMessages()
+    {
         self::$handler->create_group("ryhmaa", "pw1");
         $return = self::$handler->create_user("randomtoken", "arto");
         self::$handler->join_chat(1, $return["id"], "pw1");

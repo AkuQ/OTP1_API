@@ -3,35 +3,41 @@
 namespace StormChat;
 
 
-class DB_Handler {
+class DB_Handler
+{
 
     private $host = "";
     private $db = "";
     private $passwd = "";
     private $user = "";
 
-    function __construct($filename) {
-        $file = fopen($filename, "r");
-        $this->host = trim(fgets($file));
+    function __construct($filename)
+    {
+        $settings = include_once($filename);
+        $this->host = $settings->host;
+        /*
         $this->db = trim(fgets($file));
         $this->user = trim(fgets($file));
         $this->passwd = trim(fgets($file));
         fclose($file);
+        */
     }
 
-    function connect() {
+    function connect()
+    {
         $connection = mysqli_connect($this->host, $this->user, $this->passwd, $this->db);
         return $connection;
     }
 
-    function get_groups() {
+    function get_groups()
+    {
         $date = getdate();
         $year = $date['year'];
         $month = $date['mon'];
         $day = $date['mday'];
         $connection = $this->connect();
         $sql = "SELECT * 
-        FROM chat WHERE created BETWEEN '$year-".($month - 1)."-$day 00:00:00' AND  '$year-$month-$day 23:59:59'";
+        FROM chat WHERE created BETWEEN '$year-" . ($month - 1) . "-$day 00:00:00' AND  '$year-$month-$day 23:59:59'";
         $groups = [];
         $result = $connection->query($sql);
         while ($row = $result->fetch_assoc()) {
@@ -43,8 +49,8 @@ class DB_Handler {
     }
 
 
-
-    function join_chat($chat_id, $user_id, $password) {
+    function join_chat($chat_id, $user_id, $password)
+    {
 
         $connection = $this->connect();
         $sql = "SELECT password FROM chat WHERE chat_id='$chat_id'";
@@ -65,7 +71,8 @@ class DB_Handler {
 
     }
 
-    function leave_chat($user_id) {
+    function leave_chat($user_id)
+    {
         $connection = $this->connect();
         $updated = date("Y-m-d H:i:s");
         $sql = "UPDATE user SET chat_id=null, updated='$updated' WHERE user_id='$user_id'";
@@ -73,7 +80,8 @@ class DB_Handler {
         $connection->close();
     }
 
-    function create_user($token, $name) {
+    function create_user($token, $name)
+    {
         $connection = $this->connect();
         $created = date("Y-m-d H:i:s");
         $sql = $connection->prepare("INSERT INTO user (name, token, created, updated) VALUES (?, ?, ?, ?)");
@@ -84,7 +92,8 @@ class DB_Handler {
         return $id;
     }
 
-    function create_group($name, $password) {
+    function create_group($name, $password)
+    {
         $connection = $this->connect();
         $sql = $connection->prepare("INSERT INTO chat (name, password, created, updated) VALUES (?, ?, ?, ?)");
         $hashed = hash('sha256', $password);
@@ -96,7 +105,8 @@ class DB_Handler {
         return $id;
     }
 
-    function get_messages($since_message_id, $chat_id) {
+    function get_messages($since_message_id, $chat_id)
+    {
         $connection = $this->connect();
         $sql = "SELECT * 
         FROM message WHERE message_id > '$since_message_id' AND chat_id='$chat_id'";
@@ -109,7 +119,8 @@ class DB_Handler {
         return $messages;
     }
 
-    function post_message($user_id, $chat_id, $message) {
+    function post_message($user_id, $chat_id, $message)
+    {
         $connection = $this->connect();
         $created = date("Y-m-d H:i:s");
         $sql = $connection->prepare("INSERT INTO message (chat_id, user_id, content, created) VALUES (?, ?, ?, ?)");
@@ -119,7 +130,8 @@ class DB_Handler {
 
     }
 
-    function get_chat_users($chat_id) {
+    function get_chat_users($chat_id)
+    {
         $created = new \DateTime(date("Y-m-d H:i:s"));
         $created->modify("-10 second");
         $created = $created->format("Y-m-d H:i:s");
