@@ -1,6 +1,8 @@
 <?php
 
+namespace Tests;
 
+use PHPUnit_Framework_TestCase;
 use function StormChat\remap_keys;
 
 require_once __DIR__ .'/../src/autoload.php';

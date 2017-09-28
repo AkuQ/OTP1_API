@@ -1,8 +1,12 @@
 <?php
 
+namespace Tests;
+
 require_once __DIR__ .'/../src/autoload.php';
 require_once __DIR__ .'/../vendor/autoload.php';
 
+use Exception;
+use PHPUnit_Framework_TestCase;
 use StormChat\API_Handler;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -163,7 +167,7 @@ class API_HandlerTest extends PHPUnit_Framework_TestCase
     public function test_calls_class_method() {
         $handler = new API_Handler();
 
-        eval('class TestClass {public function foo($a, $b, $c, $d="order"){return  "$a $b $c $d";}}');
+        eval('namespace Tests; class TestClass {public function foo($a, $b, $c, $d="order"){return  "$a $b $c $d";}}');
         /** @noinspection PhpUndefinedClassInspection */
         $instance = new TestClass();
 
