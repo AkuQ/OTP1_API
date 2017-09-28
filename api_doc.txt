@@ -34,3 +34,9 @@ REQUEST   {"name": <string>, "password": <string>}
 RESPONSE  "result": {"id": <int>}
   id: chat rooms's ID
   
+POST      /users
+HEADER    Content-Type:application/json
+REQUEST   {"chat_id": <string>}
+  chat_id: chat room's id
+RESPONSE  "result": [{"name": <string>}
+  name: user's name

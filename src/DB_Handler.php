@@ -65,6 +65,14 @@ class DB_Handler {
 
     }
 
+    function leave_chat($user_id) {
+        $connection = $this->connect();
+        $updated = date("Y-m-d H:i:s");
+        $sql = "UPDATE user SET chat_id=null, updated='$updated' WHERE user_id='$user_id'";
+        $connection->query($sql);
+        $connection->close();
+    }
+
     function create_user($name) {
         $token = openssl_random_pseudo_bytes(128);
         $connection = $this->connect();
@@ -89,14 +97,14 @@ class DB_Handler {
 
     }
 
-    function get_messages($user_id, $chat_id) {
+    function get_messages($since_message_id, $chat_id) {
         $connection = $this->connect();
-        $sql = "SELECT content 
-        FROM message WHERE user_id='$user_id' AND chat_id='$chat_id'";
+        $sql = "SELECT * 
+        FROM message WHERE message_id > '$since_message_id' AND chat_id='$chat_id'";
         $messages = [];
         $result = $connection->query($sql);
         while ($row = $result->fetch_assoc()) {
-            array_push($messages, $row["content"]);
+            $messages[] = $row;
         }
         $connection->close();
         return $messages;
@@ -115,16 +123,16 @@ class DB_Handler {
     function get_chat_users($chat_id) {
         $created = new \DateTime(date("Y-m-d H:i:s"));
         $created->modify("-10 second");
-        $created->format("Y-m-d H:i:s");
+        $created = $created->format("Y-m-d H:i:s");
         $connection = $this->connect();
-        $sql = "SELECT name 
+        $sql = "SELECT * 
         FROM user WHERE chat_id='$chat_id' AND updated > '$created'";
-        $messages = [];
+        $users = [];
         $result = $connection->query($sql);
         while ($row = $result->fetch_assoc()) {
-            array_push($messages, $row["content"]);
+            $users[] = $row;
         }
-
+        return $users;
     }
 
 

@@ -2,7 +2,6 @@
 
 namespace StormChat;
 use PHPUnit_Framework_TestCase;
-
 require_once __DIR__."/../src/autoload.php";
 $get_date_return = ['year' => 2000, 'mon' => 11, 'mday' => 11, 'h' => 23, 'i' => 40, 's' => 20 ];
 
@@ -126,7 +125,7 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
 
         self::$handler->create_group("ryhmaa", "pw1");
         $return = self::$handler->create_user("arto");
-        $bool = self::$handler->join_chat(1, $return["id"], "pw1");
+        self::$handler->join_chat(1, $return["id"], "pw1");
         self::$handler->post_message(1, 1, "Hello world");
         self::$handler->post_message(1, 1, "dlrow elloH");
         $result = self::$connection->query("SELECT * FROM message");
@@ -148,7 +147,59 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
     }
 
     public function testGetChatUsers() {
+        self::$handler->create_group("ryhmaa", "pw1");
 
+        $return = self::$handler->create_user("arto");
+        self::$handler->join_chat(1, $return["id"], "pw1");
+
+        $return = self::$handler->create_user("tuomas");
+        self::$handler->join_chat(1, $return["id"], "pw1");
+
+        $return = self::$handler->create_user("akseli");
+        self::$handler->join_chat(1, $return["id"], "pw1");
+
+        $users = self::$handler->get_chat_users(1);
+        $this->assertEquals("arto", $users[0]["name"]);
+        $this->assertEquals("tuomas", $users[1]["name"]);
+        $this->assertEquals("akseli", $users[2]["name"]);
+        global $get_date_return;
+        $get_date_return["s"] = 31;
+        $users = self::$handler->get_chat_users(1);
+        $this->assertEquals(true, empty($users));
+
+
+    }
+
+    public function testLeaveChat() {
+        self::$handler->create_group("ryhmaa", "pw1");
+        $return = self::$handler->create_user("arto");
+        self::$handler->join_chat(1, $return["id"], "pw1");
+        $users = self::$handler->get_chat_users(1);
+        $this->assertEquals("arto", $users[0]["name"]);
+        self::$handler->leave_chat(1);
+        $users = self::$handler->get_chat_users(1);
+        $this->assertEquals(true, empty($users));
+    }
+
+    public function testGetMessages() {
+        self::$handler->create_group("ryhmaa", "pw1");
+        $return = self::$handler->create_user("arto");
+        self::$handler->join_chat(1, $return["id"], "pw1");
+        self::$handler->post_message(1, 1, "Hello world");
+        self::$handler->post_message(1, 1, "dlrow elloH");
+        self::$handler->post_message(1, 1, "A");
+        self::$handler->post_message(1, 1, "B");
+        self::$handler->post_message(1, 1, "C");
+        $messages = self::$handler->get_messages(0, 1);
+        $this->assertEquals(5, count($messages));
+        $this->assertEquals("Hello world", $messages[0]["content"]);
+        $this->assertEquals("dlrow elloH", $messages[1]["content"]);
+        $this->assertEquals(1, $messages[0]["user_id"]);
+        $this->assertEquals(1, $messages[0]["chat_id"]);
+        $this->assertEquals(1, $messages[0]["message_id"]);
+        $this->assertEquals(2, $messages[1]["message_id"]);
+        $messages = self::$handler->get_messages(4, 1);
+        $this->assertEquals(1, count($messages));
     }
 
 
