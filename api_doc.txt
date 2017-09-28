@@ -1,42 +1,76 @@
 
 
-POST       /get_time
-HEADER    Content-Type:application/json
-REQUEST   {}
-RESPONSE  "result": <string>
-  result: timestring in format Y-m-d H:i:s
-  
-POST       /users/create
-HEADER    Content-Type:application/json
-REQUEST   {"name": <string>}
-   name: user's screen name
+POST        /get_time
+HEADER      Content-Type:application/json
+REQUEST     {}
+RESPONSE    "result": <string>
+    result: timestring in format Y-m-d H:i:s
+
+
+POST        /users/create
+HEADER      Content-Type:application/json
+REQUEST     {"name": <string>}
+    name: user's screen name
 RESPONSE  "result": {"id": <int>, "token": <string>}
-  id: user's ID
-  token: user's authentication token
-  
-POST      /rooms/list
-HEADER    Content-Type:application/json
-REQUEST   {}
-RESPONSE
-        "result":
-          [{
-            "id": <int>
-            "name": <string>
-          }]
-  id: chat rooms's ID
-  name: chat rooms's display name
-  
-POST      /rooms/create
-HEADER    Content-Type:application/json
-REQUEST   {"name": <string>, "password": <string>}
-  name: chat room's display name
-  password: chat room's password
-RESPONSE  "result": {"id": <int>}
-  id: chat rooms's ID
-  
-POST      /users
-HEADER    Content-Type:application/json
-REQUEST   {"chat_id": <string>}
-  chat_id: chat room's id
-RESPONSE  "result": [{"name": <string>}
-  name: user's name
+    id: user's ID
+    token: user's authentication token
+
+
+POST        /rooms/list
+HEADER      Content-Type:application/json
+REQUEST     {}
+RESPONSE    "result":
+            [{
+                "id": <int>
+                "name": <string>
+            }]
+    id: chat rooms's ID
+    name: chat rooms's display name
+
+
+POST        /rooms/create
+HEADER      Content-Type:application/json
+REQUEST     {"name": <string>, "password": <string>}
+    name: chat room's display name
+    password: chat room's password
+RESPONSE    "result": {"id": <int>}
+    id: chat rooms's ID
+
+
+POST        /users/list
+HEADER      Content-Type:application/json
+REQUEST     {"chat_id": <int>}
+    chat_id: chat room's id
+RESPONSE    "result":
+            [{
+                "name": <string>,
+                "id": <int>
+            }]
+    name: user's name
+    id: users's ID
+
+
+POST        /messages/list
+HEADERS     Content-Type:application/json
+REQUEST     {"chat_id": <int>, "since": <int>}
+    chat_id: which chat room's messages
+    since: id of last received message
+RESPONSE    "result":
+            [{
+                "id": <int>,
+                "user_id" <int>,
+                "message": <string>
+            }]
+    id: message's ID
+    user_id: which user's message
+    message: message content
+
+
+POST        /messages/post
+HEADERS     Content-Type:application/json
+REQUEST     {"user_id": <int>, "chat_id": <int>, "message": <string>}
+    user_id: posting user's ID
+    chat_id: which chat room to post message in
+    message: message content
+RESPONSE    "result": <int>
+    result: posted message's ID
