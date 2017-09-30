@@ -1,7 +1,7 @@
 <?php
 
 namespace StormChat {
-    require_once __DIR__ . "/../src/autoload.php";
+    require_once __DIR__ . "/../autoload.php";
 
     class FakeDate {
         public static $date = ['year' => 2000, 'mon' => 11, 'mday' => 11, 'h' => 23, 'i' => 40, 's' => 20];
@@ -33,7 +33,7 @@ namespace StormChat\tests {
     use StormChat\DB_Handler;
     use StormChat\FakeDate;
 
-    require_once __DIR__ . "/../src/autoload.php";
+    require_once __DIR__ . "/../autoload.php";
 
 
     class DB_HandlerTest extends PHPUnit_Framework_TestCase
