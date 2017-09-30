@@ -5,22 +5,21 @@ namespace StormChat;
 
 class DB_Handler
 {
-
     private $host = "";
     private $db = "";
     private $passwd = "";
     private $user = "";
 
-    function __construct($filename)
+    /**
+     * DB_Handler constructor.
+     * @param array $config Array containing keys 'host', 'user', 'password' and 'db'.
+     */
+    function __construct(array $config)
     {
-        $settings = include_once($filename);
-        $this->host = $settings->host;
-        /*
-        $this->db = trim(fgets($file));
-        $this->user = trim(fgets($file));
-        $this->passwd = trim(fgets($file));
-        fclose($file);
-        */
+        $this->host = $config['host'];
+        $this->user = $config['user'];
+        $this->passwd = $config['password'];
+        $this->db = $config['db'];
     }
 
     function connect()
@@ -127,7 +126,6 @@ class DB_Handler
         $sql->bind_param("iiss", $chat_id, $user_id, $message, $created);
         $sql->execute();
         $connection->close();
-
     }
 
     function get_chat_users($chat_id)
@@ -145,6 +143,4 @@ class DB_Handler
         }
         return $users;
     }
-
-
 }
