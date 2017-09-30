@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests;
+namespace StormChat\tests;
 
-require_once __DIR__ .'/../src/autoload.php';
-require_once __DIR__ .'/../vendor/autoload.php';
+require_once __DIR__ . '/../src/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use Exception;
 use PHPUnit_Framework_TestCase;
