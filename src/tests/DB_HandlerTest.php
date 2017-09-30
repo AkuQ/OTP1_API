@@ -48,7 +48,7 @@ namespace StormChat\tests {
             parent::setUpBeforeClass();
             self::$handler = new DB_Handler(parse_ini_file(__DIR__ . '/config/testdb.ini'));
             self::$connection = self::$handler->connect();
-            $sql_create_tables = file_get_contents(__DIR__ . "/../db/create_tables.sql");
+            $sql_create_tables = file_get_contents(__DIR__ . "/../../db/create_tables.sql");
             $sql = explode(";", $sql_create_tables);
             print self::$connection->error;
             self::$connection->query("SET FOREIGN_KEY_CHECKS = 0");
