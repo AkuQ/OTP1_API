@@ -50,19 +50,16 @@ class DB_Handler
 
     function join_chat($chat_id, $user_id, $password)
     {
-
         $connection = $this->connect();
         $sql = "SELECT password FROM chat WHERE chat_id='$chat_id'";
-        $hashed = hash('sha256', $password);
         $result = $connection->query($sql);
 
         $row = $result->fetch_assoc();
-        if ($row["password"] === $hashed) {
+        if ($row["password"] === $password) {
             $updated = date("Y-m-d H:i:s");
             $sql = "UPDATE user SET chat_id='$chat_id', updated='$updated' WHERE user_id='$user_id'";
             $connection->query($sql);
             $connection->close();
-
             return true;
         }
         $connection->close();
@@ -95,9 +92,8 @@ class DB_Handler
     {
         $connection = $this->connect();
         $sql = $connection->prepare("INSERT INTO chat (name, password, created, updated) VALUES (?, ?, ?, ?)");
-        $hashed = hash('sha256', $password);
         $created = date("Y-m-d H:i:s");
-        $sql->bind_param("ssss", $name, $hashed, $created, $created);
+        $sql->bind_param("ssss", $name, $password, $created, $created);
         $sql->execute();
         $id = $connection->insert_id;
         $connection->close();
