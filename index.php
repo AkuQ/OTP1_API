@@ -19,7 +19,7 @@ $app['api_handler'] = function () {
 };
 
 $app['controller'] = function () {
-    return new Controller(new DB_Handler(parse_ini_file('/config/db.ini')));
+    return new Controller(new DB_Handler(parse_ini_file(__DIR__.'/config/db.ini')));
 };
 
 
