@@ -1,22 +1,26 @@
 <?php
 
 namespace StormChat;
+
 use PHPUnit_Framework_TestCase;
-require_once __DIR__."/../src/autoload.php";
-$get_date_return = ['year' => 2000, 'mon' => 11, 'mday' => 11, 'h' => 23, 'i' => 40, 's' => 20 ];
+
+require_once __DIR__ . "/../src/autoload.php";
+$get_date_return = ['year' => 2000, 'mon' => 11, 'mday' => 11, 'h' => 23, 'i' => 40, 's' => 20];
 
 function getdate()
 {
     global $get_date_return;
     return $get_date_return;
 }
+
 function date($param)
 {
     global $get_date_return;
-    return $get_date_return['year']."-".$get_date_return['mon']."-".$get_date_return['mday']." ".
-        $get_date_return['h'].":".$get_date_return['i'].":".$get_date_return['s'];
+    return $get_date_return['year'] . "-" . $get_date_return['mon'] . "-" . $get_date_return['mday'] . " " .
+        $get_date_return['h'] . ":" . $get_date_return['i'] . ":" . $get_date_return['s'];
 
 }
+
 class DB_HandlerTest extends PHPUnit_Framework_TestCase
 {
     private static $connection = null;
@@ -25,7 +29,7 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
     static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        self::$handler = new DB_Handler("testdb.txt");
+        self::$handler = new DB_Handler("testdb.php");
         self::$connection = self::$handler->connect();
         $sql_create_tables = file_get_contents("../db/create_tables.sql");
         $sql = explode(";", $sql_create_tables);
@@ -60,24 +64,25 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
     {
         global $get_date_return;
         $get_date_return['year'] = 2000;
-        self::$handler->create_group("ryhma1", "pw1");
+        $id_1 = self::$handler->create_group("ryhma1", "pw1");
         $get_date_return['year'] = 1800;
         self::$handler->create_group("ryhma2", "pw2");
         $get_date_return['year'] = 2000;
         $groups = self::$handler->get_groups();
         $this->assertEquals(1, count($groups));
         $this->assertEquals("ryhma1", $groups[0]["name"]);
-        $this->assertEquals(1, $groups[0]["chat_id"]);
+        $this->assertEquals($id_1, $groups[0]["chat_id"]);
     }
 
     public function testCreateUser()
     {
-        $return = self::$handler->create_user("arto");
+        $return = self::$handler->create_user("randomtoken", "arto");
         $result = self::$connection->query("SELECT * FROM user");
         $row = $result->fetch_assoc();
         $this->assertEquals("arto", $row["name"]);
-        $this->assertEquals($return["token"], $row["token"]);
-        $this->assertEquals($return["id"], $row["user_id"]);
+        $this->assertEquals("randomtoken", $row["token"]);
+
+        $this->assertEquals($return, $row["user_id"]);
         $this->assertEquals(date("null"), $row["created"]);
         $this->assertEquals(date("null"), $row["updated"]);
     }
@@ -103,11 +108,12 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(date("null"), $row["updated"]);
     }
 
-    public function testJoinChat() {
+    public function testJoinChat()
+    {
         global $get_date_return;
         self::$handler->create_group("ryhmaa", "pw1");
         $get_date_return["year"] = "1800";
-        $return = self::$handler->create_user("arto");
+        $return = self::$handler->create_user("randomtoken", "arto");
         $get_date_return["year"] = "2000";
         $bool = self::$handler->join_chat(1, $return["id"], "pw1");
         $this->assertEquals(true, $bool);
@@ -116,15 +122,16 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
         $get_date_return["year"] = "1800";
         $this->assertEquals(date(null), $row["created"]);
         $get_date_return["year"] = "2000";
-        $this->assertEquals(date(null), $row["updated"]);
         $this->assertEquals(1, $row["chat_id"]);
+        $this->assertEquals(date(null), $row["updated"]);
         $this->assertEquals(false, self::$handler->join_chat(1, $return["id"], "pw2"));
     }
 
-    public function testPostMessage() {
+    public function testPostMessage()
+    {
 
         self::$handler->create_group("ryhmaa", "pw1");
-        $return = self::$handler->create_user("arto");
+        $return = self::$handler->create_user("randomtoken", "arto");
         self::$handler->join_chat(1, $return["id"], "pw1");
         self::$handler->post_message(1, 1, "Hello world");
         self::$handler->post_message(1, 1, "dlrow elloH");
@@ -146,16 +153,17 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
 
     }
 
-    public function testGetChatUsers() {
+    public function testGetChatUsers()
+    {
         self::$handler->create_group("ryhmaa", "pw1");
 
-        $return = self::$handler->create_user("arto");
+        $return = self::$handler->create_user("randomtoken", "arto");
         self::$handler->join_chat(1, $return["id"], "pw1");
 
-        $return = self::$handler->create_user("tuomas");
+        $return = self::$handler->create_user("randomtoken", "tuomas");
         self::$handler->join_chat(1, $return["id"], "pw1");
 
-        $return = self::$handler->create_user("akseli");
+        $return = self::$handler->create_user("randomtoken", "akseli");
         self::$handler->join_chat(1, $return["id"], "pw1");
 
         $users = self::$handler->get_chat_users(1);
@@ -170,9 +178,10 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
 
     }
 
-    public function testLeaveChat() {
+    public function testLeaveChat()
+    {
         self::$handler->create_group("ryhmaa", "pw1");
-        $return = self::$handler->create_user("arto");
+        $return = self::$handler->create_user("randomtoken", "arto");
         self::$handler->join_chat(1, $return["id"], "pw1");
         $users = self::$handler->get_chat_users(1);
         $this->assertEquals("arto", $users[0]["name"]);
@@ -181,9 +190,10 @@ class DB_HandlerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(true, empty($users));
     }
 
-    public function testGetMessages() {
+    public function testGetMessages()
+    {
         self::$handler->create_group("ryhmaa", "pw1");
-        $return = self::$handler->create_user("arto");
+        $return = self::$handler->create_user("randomtoken", "arto");
         self::$handler->join_chat(1, $return["id"], "pw1");
         self::$handler->post_message(1, 1, "Hello world");
         self::$handler->post_message(1, 1, "dlrow elloH");
