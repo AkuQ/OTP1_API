@@ -167,7 +167,7 @@ class API_HandlerTest extends PHPUnit_Framework_TestCase
     public function test_calls_class_method() {
         $handler = new API_Handler();
 
-        eval('namespace Tests; class TestClass {public function foo($a, $b, $c, $d="order"){return  "$a $b $c $d";}}');
+        eval('namespace ' . __NAMESPACE__ . '; class TestClass {public function foo($a, $b, $c, $d="order"){return  "$a $b $c $d";}}');
         /** @noinspection PhpUndefinedClassInspection */
         $instance = new TestClass();
 
