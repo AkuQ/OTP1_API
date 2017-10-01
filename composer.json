@@ -3,6 +3,6 @@
     "silex/silex": "~2.0"
   },
   "autoload": {
-    "files": ["./src/autoload.php","./settings/testdb.php"]
+    "files": ["./src/autoload.php", "./vendor/autoload.php"]
   }
 }
