@@ -88,12 +88,11 @@ class ControllerTest extends PHPUnit_Framework_TestCase
     }
 
     public function test_join_chat() {
-
+        self::$handler->method('join_chat')->with($this->equalTo(1), $this->equalTo(1), $this->equalTo( "passw"))->willReturn(true);
+        $actual =  self::$controller->join_room(1, 1, "passw");
+        self::assertEquals(1, $actual);
     }
 
-    public function test_leave_chat(){
-
-    }
 
 
 }
