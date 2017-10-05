@@ -20,14 +20,8 @@ class Controller {
     }
 
     function create_room($name, $password){
-        $password = hash('sha256', $password);
         $room_id = $this->db_handler->create_group($name, $password);
         return $room_id;
-    }
-
-    function join_room($chat_id, $user_id, $password) {
-        $password = hash('sha256', $password);
-        return $this->db_handler->join_chat($chat_id, $user_id, $password);  # todo: in API handler, response for functions that simply return true/false
     }
 
     function list_users($chat_id) {

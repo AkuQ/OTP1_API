@@ -115,16 +115,18 @@ namespace StormChat\tests {
             self::$handler->create_group("ryhmaa", "pw1");
             self::$handler->create_group("ryhmab", "pw2");
             $result = self::$connection->query("SELECT * FROM chat");
+            $pass_one = hash('sha256', "pw1");
+            $pass_two = hash('sha256', "pw2");
             $row = $result->fetch_assoc();
             $this->assertEquals("ryhmaa", $row["name"]);
             $this->assertEquals(1, $row["chat_id"]);
-            $this->assertEquals("pw1", $row["password"]);
+            $this->assertEquals($pass_one, $row["password"]);
             $this->assertEquals(FakeDate::date("Y-m-d H:i:s"), $row["created"]);
             $this->assertEquals(FakeDate::date("Y-m-d H:i:s"), $row["updated"]);
             $row = $result->fetch_assoc();
             $this->assertEquals("ryhmab", $row["name"]);
             $this->assertEquals(2, $row["chat_id"]);
-            $this->assertEquals("pw2", $row["password"]);
+            $this->assertEquals($pass_two, $row["password"]);
             $this->assertEquals(FakeDate::date("Y-m-d H:i:s"), $row["created"]);
             $this->assertEquals(FakeDate::date("Y-m-d H:i:s"), $row["updated"]);
         }
