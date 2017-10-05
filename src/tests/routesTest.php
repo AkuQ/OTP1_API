@@ -158,9 +158,6 @@ class routesTest extends WebTestCase {
         self::assertEquals(['result' => 1], $content);
     }
 
-
-    # todo: join + leave room
-
     public function test_list_messages(){
         $room_id = 'some_id';
         $since = '77';
