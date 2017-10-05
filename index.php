@@ -97,3 +97,5 @@ $app->post('/messages/post', function (Request $request) use ($app) {
 
 
 $app->run();
+
+return $app;
