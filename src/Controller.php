@@ -31,7 +31,6 @@ class Controller {
 
     function leave_room($user_id){
         $this->db_handler->leave_chat($user_id);
-        return true;
     }
 
     function list_users($chat_id) {
