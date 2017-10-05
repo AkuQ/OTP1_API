@@ -182,5 +182,25 @@ class API_HandlerTest extends PHPUnit_Framework_TestCase
         $actual = $handler->respond($request, [$instance, 'foo']);
         self::assertEquals($expected, $actual);
     }
+
+    public function test_return_bit_flag_on_boolean_and_void_returns(){
+        $handler = new API_Handler();
+        $request = new Request();
+
+        $actual = $handler->respond($request, function (){
+            return;
+        });
+        self::assertEquals('{"result":1}', $actual);
+
+        $actual = $handler->respond($request, function (){
+            return true;
+        });
+        self::assertEquals('{"result":1}', $actual);
+
+        $actual = $handler->respond($request, function (){
+            return false;
+        });
+        self::assertEquals('{"result":0}', $actual);
+    }
 }
 
