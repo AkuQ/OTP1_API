@@ -70,6 +70,12 @@ class API_Handler
         if (is_object($ret)){  #todo: check for objects recursively
             throw new Exception("Cannot return object");
         }
+        else if ($ret === null) {
+            $ret = 1;
+        }
+        else if (is_bool($ret)){
+            $ret = (int)$ret;
+        }
         $ret =  ['result' => $ret];
         return json_encode($ret);
     }
