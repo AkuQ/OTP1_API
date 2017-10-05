@@ -2,7 +2,10 @@
   "require": {
     "silex/silex": "~2.0"
   },
+  "require-dev": {
+    "symfony/browser-kit": "~3.0"
+  },
   "autoload": {
-    "files": ["./src/autoload.php","./settings/testdb.php"]
+    "files": ["./src/autoload.php", "./vendor/autoload.php"]
   }
 }
