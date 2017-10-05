@@ -87,5 +87,13 @@ class ControllerTest extends PHPUnit_Framework_TestCase
         self::assertEquals(1, $actual);
     }
 
+    public function test_join_chat() {
+
+    }
+
+    public function test_leave_chat(){
+
+    }
+
 
 }
