@@ -60,7 +60,7 @@ namespace StormChat\tests {
             self::$connection->query("DROP TABLE IF EXISTS chat, user, message, workspace, workspace_line, line_lock");
             self::$connection->query("SET FOREIGN_KEY_CHECKS = 1");
             foreach ($sql as $item) {
-                self::$connection->query($item);
+                if($item) self::$connection->query($item);
             }
         }
 
@@ -155,13 +155,14 @@ namespace StormChat\tests {
             self::$handler->create_group("ryhmaa", "pw1");
             $return = self::$handler->create_user("randomtoken", "arto");
             self::$handler->join_chat(1, $return["id"], "pw1");
-            self::$handler->post_message(1, 1, "Hello world");
-            self::$handler->post_message(1, 1, "dlrow elloH");
+            $id_1 = self::$handler->post_message(1, 1, "Hello world");
+            $id_2 = self::$handler->post_message(1, 1, "dlrow elloH");
             $result = self::$connection->query("SELECT * FROM message");
             $row = $result->fetch_assoc();
             $this->assertEquals(FakeDate::date("Y-m-d H:i:s"), $row["created"]);
             $this->assertEquals(1, $row["chat_id"]);
             $this->assertEquals(1, $row["message_id"]);
+            $this->assertEquals(1, $id_1);
             $this->assertEquals(1, $row["user_id"]);
             $this->assertEquals("Hello world", $row["content"]);
 
@@ -169,6 +170,7 @@ namespace StormChat\tests {
             $this->assertEquals(FakeDate::date("Y-m-d H:i:s"), $row["created"]);
             $this->assertEquals(1, $row["chat_id"]);
             $this->assertEquals(2, $row["message_id"]);
+            $this->assertEquals(2, $id_2);
             $this->assertEquals(1, $row["user_id"]);
             $this->assertEquals("dlrow elloH", $row["content"]);
         }

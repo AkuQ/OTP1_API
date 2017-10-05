@@ -125,7 +125,10 @@ class DB_Handler
         $sql = $connection->prepare("INSERT INTO message (chat_id, user_id, content, created) VALUES (?, ?, ?, ?)");
         $sql->bind_param("iiss", $chat_id, $user_id, $message, $created);
         $sql->execute();
+        $id = $connection->insert_id;
         $connection->close();
+        return $id;
+
     }
 
     function get_chat_users($chat_id)
