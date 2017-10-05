@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: akseli
- * Date: 9.9.2017
- * Time: 14:00
- */
 
 namespace StormChat;
-
 
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
@@ -82,6 +75,6 @@ class API_Handler
     }
 
     public function error_response(Request $request, Exception $e) {
-
+        throw new Exception('Undefined method'); #todo
     }
 }
