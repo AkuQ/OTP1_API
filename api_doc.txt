@@ -33,8 +33,27 @@ HEADER      Content-Type:application/json
 REQUEST     {"name": <string>, "password": <string>}
     name: chat room's display name
     password: chat room's password
-RESPONSE    "result": {"id": <int>}
-    id: chat rooms's ID
+RESPONSE    "result": <int>
+    result: chat rooms's ID
+
+
+POST        /rooms/join
+HEADER      Content-Type:application/json
+REQUEST     {"chat_id": <int>, "user_id": <int>, "password": <string>}
+    id: chat room's ID
+    user_id: joining user's ID
+    password: chat room's password
+RESPONSE    "result": <bool>
+    result: 1 on success, 0 if password wrong
+
+
+POST        /rooms/leave
+HEADER      Content-Type:application/json
+REQUEST     {"user_id": <int>}
+    id: chat room's ID
+    user_id: leaving user's ID
+RESPONSE    "result": <bool>
+    result: 1 on success, 0 otherwise
 
 
 POST        /users/list

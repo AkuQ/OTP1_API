@@ -128,6 +128,39 @@ class routesTest extends WebTestCase {
         self::assertEquals(['result' => $out_users], $content);
     }
 
+    public function test_join_room(){
+        $user_id = 45609;
+        $room_id = 8953879;
+        $room_password = 'pw1';
+
+        $this->controller_mock->method('join_room')
+            ->with(self::equalTo($room_id), self::equalTo($user_id), self::equalTo($room_password))
+            ->willReturn(true);
+
+        $client = self::createClient();
+        $client->request('POST', '/rooms/join', [], [], [],
+            json_encode(['chat_id' => $room_id, 'password' => $room_password, 'user_id' => $user_id]));
+        $content = self::json_content_as_array($client->getResponse());
+        self::assertEquals(['result' => 1], $content);
+    }
+
+    public function test_leave_room(){
+        $user_id = 45609;
+
+        $this->controller_mock->method('join_room')
+            ->with(self::equalTo($user_id))
+            ->willReturn(true);
+
+        $client = self::createClient();
+        $client->request('POST', '/rooms/leave', [], [], [],
+            json_encode(['user_id' => $user_id]));
+        $content = self::json_content_as_array($client->getResponse());
+        self::assertEquals(['result' => 1], $content);
+    }
+
+
+    # todo: join + leave room
+
     public function test_list_messages(){
         $room_id = 'some_id';
         $since = '77';
@@ -146,5 +179,22 @@ class routesTest extends WebTestCase {
             json_encode(['chat_id' => $room_id, 'since' => $since]));
         $content = self::json_content_as_array($client->getResponse());
         self::assertEquals(['result' => $out_messages], $content);
+    }
+
+    public function test_post_message(){
+        $message = 'hello world1!';
+        $room_id = 77777777777777;
+        $user_id = 1234;
+        $out_id = 6346;
+
+        $this->controller_mock->method('post_message')
+            ->with(self::equalTo($user_id), self::equalTo($room_id), self::equalTo($message))
+            ->willReturn($out_id);
+
+        $client = self::createClient();
+        $client->request('POST', '/messages/post', [], [], [],
+            json_encode(['chat_id' => $room_id, 'message' => $message, 'user_id' => $user_id]));
+        $content = self::json_content_as_array($client->getResponse());
+        self::assertEquals(['result' => $out_id], $content);
     }
 }

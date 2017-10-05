@@ -74,6 +74,20 @@ $app->post('/rooms/create', function (Request $request) use ($app) {
     );
 });
 
+$app->post('/rooms/join', function (Request $request) use ($app) {
+    return $app['api_handler']->respond(
+        $request,
+        [$app['controller'], 'join_room']
+    );
+});
+
+$app->post('/rooms/leave', function (Request $request) use ($app) {
+    return $app['api_handler']->respond(
+        $request,
+        [$app['controller'], 'leave_room']
+    );
+});
+
 $app->post('/users/list', function (Request $request) use ($app) {
     return $app['api_handler']->respond(
         $request,

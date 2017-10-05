@@ -24,6 +24,15 @@ class Controller {
         return $room_id;
     }
 
+    function join_room($chat_id, $user_id, $password){
+        $success = $this->db_handler->join_chat($chat_id, $user_id, $password);
+        return $success;
+    }
+
+    function leave_room($user_id){
+        $this->db_handler->leave_chat($user_id);
+    }
+
     function list_users($chat_id) {
         $users = $this->db_handler->get_chat_users($chat_id);
         return remap_keys($users, ['name', 'user_id' => 'id']);

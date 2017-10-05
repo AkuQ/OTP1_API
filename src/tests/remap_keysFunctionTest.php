@@ -71,6 +71,12 @@ class remap_keysFunctionTest extends PHPUnit_Framework_TestCase
             ['g' => '???',  9, 'A' => 'e', 'C' => 'a',]
         ];
         self::assertEquals($expected, $actual);
+    }
 
+    public function test_handles_empty_array(){
+        $arr = [];
+
+        $actual = remap_keys($arr, ['g', 2, 'c' => 'A', 'a' => 'C']);
+        self::assertEquals([], $actual);
     }
 }
