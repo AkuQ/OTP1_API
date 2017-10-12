@@ -77,7 +77,14 @@ class API_Handler
             $ret = (int)$ret;
         }
         $ret =  ['result' => $ret];
-        return json_encode($ret);
+
+        $json = json_encode($ret);
+
+        if($json == false) {
+            $ret = $ret['result'];
+            throw new Exception("Result $ret not encodable in JSON");
+        }
+        return $json;
     }
 
     public function error_response(Request $request, Exception $e) {

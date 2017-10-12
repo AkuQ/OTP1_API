@@ -32,7 +32,7 @@ class ControllerTest extends PHPUnit_Framework_TestCase
         self::$handler->method('create_user')->willReturn(1);
         $actual =  self::$controller->create_user("artsi");
         $this->assertEquals(1, $actual["id"]);
-        $this->assertEquals(false, empty($actual["token"]));
+        $this->assertJson(json_encode($actual["token"]));  # i.e. AssertIsEncodableInJSON
     }
 
     public function test_list_rooms() {
