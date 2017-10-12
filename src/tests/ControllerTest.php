@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: artoju
- * Date: 3.10.2017
- * Time: 13:50
- */
 
 namespace StormChat\tests;
 
@@ -15,13 +9,12 @@ use PHPUnit_Framework_TestCase;
 use StormChat\Controller;
 use StormChat\DB_Handler;
 
-
 class ControllerTest extends PHPUnit_Framework_TestCase
 {
 
-    /** @var DB_Handler */
+    /** @var DB_Handler|\PHPUnit_Framework_MockObject_MockObject */
     private static $handler = null;
-    /** @var DB_Handler */
+    /** @var Controller */
     private static $controller = null;
 
     public function setUp()
@@ -36,16 +29,13 @@ class ControllerTest extends PHPUnit_Framework_TestCase
     }
 
     public function test_create_user() {
-
         self::$handler->method('create_user')->willReturn(1);
         $actual =  self::$controller->create_user("artsi");
         $this->assertEquals(1, $actual["id"]);
         $this->assertEquals(false, empty($actual["token"]));
-
     }
 
     public function test_list_rooms() {
-
         self::$handler->method('get_groups')->willReturn([0 =>["chat_id"=> 1, "name"=>"ryhma1"], 1 =>["chat_id"=> 2, "name"=>"ryhma2"]]);
         $actual = self::$controller->list_rooms();
         self::assertEquals(1, $actual[0]["id"]);
@@ -53,7 +43,6 @@ class ControllerTest extends PHPUnit_Framework_TestCase
     }
 
     public function test_create_room() {
-
         self::$handler->method('create_group')->with($this->equalTo("ryhma"),$this->equalTo("passw"))->willReturn(1);
         $actual =  self::$controller->create_room("ryhma", "passw");
         self::assertEquals(1, $actual);
@@ -92,7 +81,4 @@ class ControllerTest extends PHPUnit_Framework_TestCase
         $actual =  self::$controller->join_room(1, 1, "passw");
         self::assertEquals(1, $actual);
     }
-
-
-
 }
