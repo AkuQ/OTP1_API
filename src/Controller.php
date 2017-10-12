@@ -9,7 +9,7 @@ class Controller {
     }
 
     function create_user($name){
-        $token = openssl_random_pseudo_bytes(128);
+        $token = base64_encode(openssl_random_pseudo_bytes(64));
         $user_id = $this->db_handler->create_user($name, $token);
         return ['id' => $user_id, 'token' => $token];
     }
