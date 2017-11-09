@@ -1,0 +1,22 @@
+<phpunit>
+    <logging>
+        <log type="coverage-html" target="./coverage/html"/>
+        <!--<log type="coverage-clover" target="/tmp/coverage.xml"/>-->
+        <!--<log type="coverage-php" target="/tmp/coverage.serialized"/>-->
+        <!--<log type="coverage-text" target="php://stdout" showUncoveredFiles="false"/>-->
+        <log type="junit" target="./coverage/junit.xml" logIncompleteSkipped="false"/>
+        <!--<log type="testdox-html" target="/tmp/testdox.html"/>-->
+        <!--<log type="testdox-text" target="/tmp/testdox.txt"/>-->
+    </logging>
+
+
+    <filter>
+
+        <whitelist>
+            <directory>./src</directory>
+            <exclude>
+                <directory>./src/tests</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+</phpunit>
