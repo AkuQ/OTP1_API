@@ -1,0 +1,5 @@
+#Add valid values and rename this file to "db.ini":
+host=
+user=
+password=
+db=
