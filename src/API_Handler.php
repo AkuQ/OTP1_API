@@ -62,10 +62,17 @@ class API_Handler
         }
 
         if ($missing_parameters) {
-            throw new Exception('Missing request parameters: ' . implode(',', $missing_parameters));
+            return json_encode([
+                'result' => 0,
+                'error' => [
+                    'name' => 'missing_params',
+                    'missing_params' => $missing_parameters
+                ]
+            ]);
         }
 
         $ret = call_user_func_array($func, $params_ordered);
+        $error = ['name' => 'no_error'];
 
         if (is_object($ret)){  #todo: check for objects recursively
             throw new Exception("Cannot return object");
@@ -76,7 +83,7 @@ class API_Handler
         else if (is_bool($ret)){
             $ret = (int)$ret;
         }
-        $ret =  ['result' => $ret];
+        $ret =  ['result' => $ret, 'error' => $error];
 
         $json = json_encode($ret);
 
