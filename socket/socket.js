@@ -18,7 +18,7 @@ io.use(function (socket, next) {
 });
 
 io.sockets.on('connection', function (socket) {
-    let room_id = socket.handshake.query.room_id;
+    let chat_id = socket.handshake.query.chat_id;
     let user_id = socket.handshake.query.user_id;
 
     socket.join(room_id);
@@ -26,25 +26,27 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('update', function (msg) {
         text = msg;
-        io.to(room_id).emit('updated', text);
+        io.to(chat_id).emit('updated', text);
         console.log(text);
     });
 
     socket.on('send message', function (msg) {
-        api.post_message(msg, function (result) {
+        api.post_message({user_id: user_id, chat_id: chat_id, msg: msg.content}, function (result) {
             if (result.result === 1)
-                io.to(room_id).emit('receive message', msg);
+                io.to(chat_id).emit('update messages', msg);
         });
     });
 
     socket.on('user enter', function (user) {
-        io.to(room_id).emit('update entered');
+        //Should have already joined the room if able to access socket,
+        //(API call not necessary)
+        io.to(chat_id).emit('update users');
     });
 
     socket.on('disconnect', function () {
-        // api_call.logout_user(user_id);
-        io.to(room_id).emit('update users');
-
+        api.leave_room({user_id: user_id}, function (result) {
+            io.to(chat_id).emit('update users');
+        });
     });
 });
 
