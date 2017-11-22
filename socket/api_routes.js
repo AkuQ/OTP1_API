@@ -1,24 +1,60 @@
 const client_http = require('http');
 
+/**
+ * @callback requestCallback
+ * @param {object} result_body
+ */
+
+
 //ROUTES:
+
+/**
+ * @param {object} params
+ * @param {int} params.chat_id
+ * @param {int} params.user_id
+ * @param {string} params.message
+ * @param {requestCallback} callback
+ */
 function post_message(params, callback) {
-    api_call('/messages/post', params, next);
+    api_call('/messages/post', params, callback);
 }
 
+/**
+ * @param {object} params
+ * @param {int} params.user_id
+ * @param {requestCallback} callback
+ */
+function leave_room(params, callback) {
+    api_call('/rooms/join', params, callback);
+}
 
-exports.post_message = post_message
+exports.post_message = post_message;
+exports.leave_room = leave_room;
 
 //AUTH:
 
-function user_access(params, next) {
+/**
+ * @param {object} params
+ * @param {int} params.user_id
+ * @param {string} params.token
+ * @param {requestCallback} callback
+ */
+function user_access_auth(params, callback) {
     api_call('/users/auth', params, function(data) {
-        is_auth(data, next)
+        is_auth(data, callback)
     });
 }
 
-function room_access(params, next) {
+/**
+ * @param {object} params
+ * @oaram {int} params.chat_id
+ * @param {int} params.user_id
+ * @param {string} params.token
+ * @param {requestCallback} callback
+ */
+function room_access_auth(params, callback) {
     api_call('/rooms/auth', params, function (data) {
-        is_auth(data, next)
+        is_auth(data, callback)
     });
 }
 
@@ -29,8 +65,12 @@ function is_auth(data, next) {
         throw new Error("Not authorized");
 }
 
-exports.auth.user_access = user_access;
-exports.auth.room_access = room_access;
+var auth = {
+  user_access: user_access_auth,
+  room_access: room_access_auth
+};
+
+exports.auth = auth;
 
 //PRIVATE:
 
