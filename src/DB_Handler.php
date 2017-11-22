@@ -22,12 +22,19 @@ class DB_Handler
         $this->db = $config['db'];
     }
 
+    /**
+     * Connects to the database, returns mysqli connection object.
+     * @return \mysqli
+     */
     function connect()
     {
         $connection = mysqli_connect($this->host, $this->user, $this->passwd, $this->db);
         return $connection;
     }
-
+    /*
+     * Fetches all joinable groups from the database.
+     * @return array
+     */
     function get_groups()
     {
         $date = getdate();
@@ -47,7 +54,11 @@ class DB_Handler
 
     }
 
-
+    /*
+     * Joins user to chat group.
+     * Returns true if succeful.
+     * @return boolean
+     */
     function join_chat($chat_id, $user_id, $password)
     {
 
@@ -70,6 +81,9 @@ class DB_Handler
 
     }
 
+    /*
+     * Removes user from chat group.
+     */
     function leave_chat($user_id)
     {
         $connection = $this->connect();
@@ -78,7 +92,10 @@ class DB_Handler
         $connection->query($sql);
         $connection->close();
     }
-
+    /*
+     * Creates user and returns user id.
+     * @return int
+     */
     function create_user($token, $name)
     {
         $connection = $this->connect();
@@ -91,6 +108,10 @@ class DB_Handler
         return $id;
     }
 
+    /*
+     * Creates group with name and password, returns group id.
+     * @return int
+     */
     function create_group($name, $password)
     {
         $connection = $this->connect();
@@ -104,6 +125,10 @@ class DB_Handler
         return $id;
     }
 
+    /*
+     * Fetches messages for certain group from database.
+     * @return array
+     */
     function get_messages($since_message_id, $chat_id)
     {
         $connection = $this->connect();
@@ -117,7 +142,10 @@ class DB_Handler
         $connection->close();
         return $messages;
     }
-
+    /*
+     * Inserts message send by user to database. Returns message id.
+     * @return int
+     */
     function post_message($user_id, $chat_id, $message)
     {
         $connection = $this->connect();
@@ -130,7 +158,10 @@ class DB_Handler
         return $id;
 
     }
-
+    /*
+     * Fetches users for chat. Returns array of users.
+     * @return array
+     */
     function get_chat_users($chat_id)
     {
         $created = new \DateTime(date("Y-m-d H:i:s"));
