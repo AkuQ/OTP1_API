@@ -13,8 +13,6 @@ app.get('/', (req, res) => res.send('StormChat Socket API'));
 
 app.get('/bad_auth', (req, res) => res.send('Authorization failed'));
 
-var text = "";
-
 io.use(function (socket, next) {
     auth.room_access(socket.handshake.query, next);
 });
