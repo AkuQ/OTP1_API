@@ -30,14 +30,14 @@ io.sockets.on('connection', function (socket) {
         console.log(text);
     });
 
-    socket.on('send message', function (msg) {
+    socket.on('post message', function (msg) {
         api.post_message({user_id: user_id, chat_id: chat_id, msg: msg.content}, function (result) {
             if (result.result === 1)
                 io.to(chat_id).emit('update messages', msg);
         });
     });
 
-    socket.on('user enter', function (user) {
+    socket.on('connect', function (user) {
         //Should have already joined the room if able to access socket,
         //(API call not necessary)
         io.to(chat_id).emit('update users');
