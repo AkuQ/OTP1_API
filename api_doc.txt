@@ -1,3 +1,5 @@
+###########
+# REST API
 
 
 POST        /get_time
@@ -92,3 +94,22 @@ REQUEST     {"user_id": <int>, "chat_id": <int>, "message": <string>}
     message: message content
 RESPONSE    "result": <int>
     result: posted message's ID
+
+
+
+##############
+# SOCKETS API:
+
+
+METHOD      'post message'
+PARAMETERS  {"content": <string>}
+    content: the message string
+EMITS       'update messages'
+
+
+METHOD      'connect' (automatic)
+EMITS       'update users'
+
+
+METHOD      'disconnect' (automatic)
+EMITS       'update users'
