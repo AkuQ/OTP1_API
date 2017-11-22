@@ -4,6 +4,8 @@ use StormChat\Controller;
 use StormChat\DB_Handler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Routing\RequestContext;
 
 require_once __DIR__.'/vendor/autoload.php';
 require_once __DIR__.'/src/autoload.php';
@@ -45,6 +47,23 @@ $app->get('/', function () {
 $app->post('/', function () {
     return "StormChat API";
 });
+
+$app->post('/users/auth', function (Request $request) use ($app) {
+    $params = $request->request->all();
+    $ok = 0;
+    if($params['user_id'] == 'test')
+        $ok = 1;
+    return json_encode(['result' => $ok]);
+});
+
+$app->post('/rooms/auth', function (Request $request) use ($app) {
+    $params = $request->request->all();
+    $ok = 0;
+    if($params['user_id'] == 'test')
+        $ok = 1;
+    return json_encode(['result' => $ok]);
+});
+
 
 $app->post('/get_time', function (Request $request) use ($app) {
     return $app['api_handler']->respond(
@@ -108,7 +127,6 @@ $app->post('/messages/post', function (Request $request) use ($app) {
         [$app['controller'], 'post_message']
     );
 });
-
 
 $app->run();
 
