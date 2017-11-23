@@ -109,8 +109,8 @@ class DB_Handler
     }
 
     /**
-    * Get user by ID, returns false if user not found.
-    * @return array|bool
+    * Get user by ID, returns NULL if user not found.
+    * @return array|null
     */
     function get_user($id)
     {
