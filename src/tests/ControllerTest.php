@@ -35,6 +35,35 @@ class ControllerTest extends PHPUnit_Framework_TestCase
         $this->assertJson(json_encode($actual["token"]));  # i.e. AssertIsEncodableInJSON
     }
 
+
+    public function test_get_user() {
+        self::$handler->method('get_user')->willReturn(1);
+        $actual =  self::$controller->create_user("artsi");
+        $this->assertEquals(1, $actual["id"]);
+        $this->assertJson(json_encode($actual["token"]));  # i.e. AssertIsEncodableInJSON
+    }
+
+    public function test_is_user_in_room() {
+        self::$handler->method('get_user')->willReturn(
+            ['user_id' => 1, 'chat_id' => 1],   //User in room
+            ['user_id' => 1, 'chat_id' => 2],   //User in different room
+            false                               //User not found
+        );
+
+        //User in room:
+        $actual = self::$controller->is_user_in_room(1, 1);
+        $this->assertEquals(true, $actual);
+
+        //User in different room:
+        $user['chat_id'] = 2;
+        $actual = self::$controller->is_user_in_room(1, 1);
+        $this->assertEquals(false, $actual);
+
+        //User not found:
+        $actual = self::$controller->is_user_in_room(1, 1);
+        $this->assertEquals(false, $actual);
+    }
+
     public function test_list_rooms() {
         self::$handler->method('get_groups')->willReturn([0 =>["chat_id"=> 1, "name"=>"ryhma1"], 1 =>["chat_id"=> 2, "name"=>"ryhma2"]]);
         $actual = self::$controller->list_rooms();

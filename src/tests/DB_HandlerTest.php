@@ -110,6 +110,27 @@ namespace StormChat\tests {
             $this->assertEquals(FakeDate::date("Y-m-d H:i:s"), $row["updated"]);
         }
 
+        public function testGetUser()
+        {
+            $user = [
+                'user_id' => $user_id = 777,
+                'name' => $name = 'aku',
+                'token' => $token = 'test',
+                'created' => $created = '2000-01-01 00:00:00',
+                'updated' => $created,
+                'chat_id' => null,
+            ];
+            $ans = self::$connection->query(
+                "INSERT INTO `user`(user_id,`name`,token,created,updated) " .
+                "VALUES ($user_id,'$name','$token','$created','$created')"
+            );
+            $return = self::$handler->get_user($user_id);
+            $this->assertEquals($user, $return);
+
+            $return = self::$handler->get_user('no_such_user');
+            $this->assertNull($return);
+        }
+
         public function testCreateGroup()
         {
             self::$handler->create_group("ryhmaa", "pw1");
