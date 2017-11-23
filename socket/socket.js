@@ -22,26 +22,22 @@ io.sockets.on('connection', function (socket) {
     let user_id = socket.handshake.query.user_id;
 
     socket.join(chat_id);
-    console.log(socket.id + ': ' + user_id + ' joined');
+
+    console.log(socket.id + ': ' + user_id + ' connected');
+    io.to(chat_id).emit('update users');
 
     socket.on('update', function (msg) {
         text = msg;
+        console.log(socket.id + ': ' + user_id + ' updated ' + text);
         io.to(chat_id).emit('updated', text);
-        console.log(text);
     });
 
     socket.on('post message', function (msg) {
         api.post_message({user_id: user_id, chat_id: chat_id, msg: msg.content}, function (result) {
             if (result.result === 1)
+                console.log(socket.id + ': ' + user_id + ' sent  ' + msg.content);
                 io.to(chat_id).emit('update messages', msg);
         });
-    });
-
-    socket.on('connect', function (user) {
-        //Should have already joined the room if able to access socket,
-        //(API call not necessary)
-        console.log(socket.id + ': ' + user_id + ' connected');
-        io.to(chat_id).emit('update users');
     });
 
     socket.on('disconnect', function () {
