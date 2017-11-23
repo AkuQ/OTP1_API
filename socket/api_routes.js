@@ -59,10 +59,14 @@ function room_access_auth(params, callback) {
 }
 
 function is_auth(data, next) {
-    if(data.result === 1)
+    if(data.result === 1) {
         next();
-    else
-        throw new Error("Not authorized");
+    }
+    else {
+        let err = new Error('Authentication error');
+        err.data = {type: 'authentication_failed'};
+        next(err);
+    }
 }
 
 var auth = {
