@@ -50,18 +50,12 @@ $app->post('/', function () {
 
 $app->post('/users/auth', function (Request $request) use ($app) {
     $params = $request->request->all();
-    $ok = 0;
-    if($params['user_id'] == 'test')
-        $ok = 1;
-    return json_encode(['result' => $ok]);
+    return json_encode(['result' => 1]);
 });
 
 $app->post('/rooms/auth', function (Request $request) use ($app) {
     $params = $request->request->all();
-    $ok = 0;
-    if($params['user_id'] == 'test')
-        $ok = 1;
-    return json_encode(['result' => $ok]);
+    return json_encode(['result' => 1]);
 });
 
 
