@@ -179,11 +179,8 @@ class DB_Handler
      */
     function get_chat_users($chat_id)
     {
-        $created = new \DateTime(date("Y-m-d H:i:s"));
-        $created->modify("-10 second");
-        $created = $created->format("Y-m-d H:i:s");
         $connection = $this->connect();
-        $sql = "SELECT * FROM user WHERE chat_id='$chat_id' AND updated > '$created'";
+        $sql = "SELECT * FROM user WHERE chat_id='$chat_id'";
         $users = [];
         $result = $connection->query($sql);
         while ($row = $result->fetch_assoc()) {
