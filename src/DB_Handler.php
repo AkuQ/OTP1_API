@@ -31,7 +31,8 @@ class DB_Handler
         $connection = mysqli_connect($this->host, $this->user, $this->passwd, $this->db);
         return $connection;
     }
-    /*
+
+    /**
      * Fetches all joinable groups from the database.
      * @return array
      */
@@ -51,10 +52,9 @@ class DB_Handler
         }
         $connection->close();
         return $groups;
-
     }
 
-    /*
+    /**
      * Joins user to chat group.
      * Returns true if succeful.
      * @return boolean
@@ -81,7 +81,7 @@ class DB_Handler
 
     }
 
-    /*
+    /**
      * Removes user from chat group.
      */
     function leave_chat($user_id)
@@ -92,7 +92,7 @@ class DB_Handler
         $connection->query($sql);
         $connection->close();
     }
-    /*
+    /**
      * Creates user and returns user id.
      * @return int
      */
@@ -108,7 +108,21 @@ class DB_Handler
         return $id;
     }
 
-    /*
+    /**
+    * Get user by ID, returns false if user not found.
+    * @return array|bool
+    */
+    function get_user($id)
+    {
+        $connection = $this->connect();
+        $sql = "SELECT * FROM user WHERE user_id = '$id'";
+        $result = $connection->query($sql);
+        $row = $result->fetch_assoc();
+        $connection->close();
+        return $row;
+    }
+
+    /**
      * Creates group with name and password, returns group id.
      * @return int
      */
@@ -125,15 +139,14 @@ class DB_Handler
         return $id;
     }
 
-    /*
+    /**
      * Fetches messages for certain group from database.
      * @return array
      */
     function get_messages($since_message_id, $chat_id)
     {
         $connection = $this->connect();
-        $sql = "SELECT * 
-        FROM message WHERE message_id > '$since_message_id' AND chat_id='$chat_id'";
+        $sql = "SELECT * FROM message WHERE message_id > '$since_message_id' AND chat_id='$chat_id'";
         $messages = [];
         $result = $connection->query($sql);
         while ($row = $result->fetch_assoc()) {
@@ -142,7 +155,8 @@ class DB_Handler
         $connection->close();
         return $messages;
     }
-    /*
+
+    /**
      * Inserts message send by user to database. Returns message id.
      * @return int
      */
@@ -158,7 +172,8 @@ class DB_Handler
         return $id;
 
     }
-    /*
+
+    /**
      * Fetches users for chat. Returns array of users.
      * @return array
      */
@@ -168,8 +183,7 @@ class DB_Handler
         $created->modify("-10 second");
         $created = $created->format("Y-m-d H:i:s");
         $connection = $this->connect();
-        $sql = "SELECT * 
-        FROM user WHERE chat_id='$chat_id' AND updated > '$created'";
+        $sql = "SELECT * FROM user WHERE chat_id='$chat_id' AND updated > '$created'";
         $users = [];
         $result = $connection->query($sql);
         while ($row = $result->fetch_assoc()) {

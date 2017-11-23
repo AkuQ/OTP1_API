@@ -33,6 +33,11 @@ class Controller {
         $this->db_handler->leave_chat($user_id);
     }
 
+    function is_user_in_room($user_id, $chat_id){
+        $user = $this->db_handler->get_user($user_id);
+        return $user && $chat_id == $user['chat_id'];
+    }
+
     function list_users($chat_id) {
         $users = $this->db_handler->get_chat_users($chat_id);
         return remap_keys($users, ['name', 'user_id' => 'id']);
