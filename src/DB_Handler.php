@@ -70,7 +70,7 @@ class DB_Handler
         $row = $result->fetch_assoc();
         if ($row["password"] === $hashed) {
             $updated = date("Y-m-d H:i:s");
-            $sql = "UPDATE user SET chat_id='$chat_id', updated='$updated' WHERE user_id='$user_id'";
+            $sql = "UPDATE user SET chat_id='$chat_id', updated='$updated', is_online=1 WHERE user_id='$user_id'";
             $connection->query($sql);
             $connection->close();
 
@@ -180,7 +180,7 @@ class DB_Handler
     function get_chat_users($chat_id)
     {
         $connection = $this->connect();
-        $sql = "SELECT * FROM user WHERE chat_id='$chat_id'";
+        $sql = "SELECT * FROM user WHERE chat_id='$chat_id' AND is_online = 1";
         $users = [];
         $result = $connection->query($sql);
         while ($row = $result->fetch_assoc()) {

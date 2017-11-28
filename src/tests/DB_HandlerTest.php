@@ -60,7 +60,9 @@ namespace StormChat\tests {
             self::$connection->query("DROP TABLE IF EXISTS chat, user, message, workspace, workspace_line, line_lock");
             self::$connection->query("SET FOREIGN_KEY_CHECKS = 1");
             foreach ($sql as $item) {
-                if($item) self::$connection->query($item);
+                if($item) {
+                    self::$connection->query($item);
+                }
             }
         }
 
@@ -119,6 +121,7 @@ namespace StormChat\tests {
                 'created' => $created = '2000-01-01 00:00:00',
                 'updated' => $created,
                 'chat_id' => null,
+                'is_online' => 0,
             ];
             $ans = self::$connection->query(
                 "INSERT INTO `user`(user_id,`name`,token,created,updated) " .
@@ -213,8 +216,10 @@ namespace StormChat\tests {
             $this->assertEquals("arto", $users[0]["name"]);
             $this->assertEquals("tuomas", $users[1]["name"]);
             $this->assertEquals("akseli", $users[2]["name"]);
-            $date = &FakeDate::$date;
-            $date["s"] = 31;
+
+            self::$handler->leave_chat($users[0]['user_id']);
+            self::$handler->leave_chat($users[1]['user_id']);
+            self::$handler->leave_chat($users[2]['user_id']);
             $users = self::$handler->get_chat_users(1);
             $this->assertEquals(true, empty($users));
         }

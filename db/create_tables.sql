@@ -28,32 +28,25 @@ CREATE TABLE `user` (
 	`chat_id` bigint,
 	`created` DATETIME NOT NULL,
 	`updated` DATETIME NOT NULL,
+	`is_online` TINYINT DEFAULT 0,
 	PRIMARY KEY (`user_id`)
 );
 
 DROP TABLE IF EXISTS `workspace`;
 CREATE TABLE `workspace` (
-	`workspace_id` bigint NOT NULL AUTO_INCREMENT,
 	`chat_id` bigint NOT NULL,
-	PRIMARY KEY (`workspace_id`)
+	`content` longtext NOT NULL DEFAULT '',
+	PRIMARY KEY (`chat_id`)
 );
 
-DROP TABLE IF EXISTS `workspace_line`;
-CREATE TABLE `workspace_line` (
-	`line_id` bigint NOT NULL,
-	`workspace_id` bigint NOT NULL,
-	`content` varchar(256) NOT NULL,
-	`line_no` bigint NOT NULL,
-	PRIMARY KEY (`line_id`,`workspace_id`)
-);
-
-DROP TABLE IF EXISTS `line_lock`;
-CREATE TABLE `line_lock` (
-	`user_id` bigint NOT NULL,
-	`workspace_id` bigint NOT NULL,
-	`line_id` bigint NOT NULL,
-	`acquired` TIMESTAMP NOT NULL,
-	PRIMARY KEY (`user_id`,`workspace_id`)
+DROP TABLE IF EXISTS `workspace_updates`;
+CREATE TABLE `workspace_updates` (
+	`update_id` bigint NOT NULL AUTO_INCREMENT,
+	`chat_id` bigint NOT NULL,
+	`pos` int NOT NULL,
+	`mode` tinyint NOT NULL,
+	`input` varchar(64),
+	PRIMARY KEY (`update_id`)
 );
 
 ALTER TABLE `message` ADD CONSTRAINT `message_fk0` FOREIGN KEY (`chat_id`) REFERENCES `chat`(`chat_id`);
@@ -64,12 +57,6 @@ ALTER TABLE `user` ADD CONSTRAINT `user_fk0` FOREIGN KEY (`chat_id`) REFERENCES 
 
 ALTER TABLE `workspace` ADD CONSTRAINT `workspace_fk0` FOREIGN KEY (`chat_id`) REFERENCES `chat`(`chat_id`);
 
-ALTER TABLE `workspace_line` ADD CONSTRAINT `workspace_line_fk0` FOREIGN KEY (`workspace_id`) REFERENCES `workspace`(`workspace_id`);
-
-ALTER TABLE `line_lock` ADD CONSTRAINT `line_lock_fk0` FOREIGN KEY (`user_id`) REFERENCES `user`(`user_id`);
-
-ALTER TABLE `line_lock` ADD CONSTRAINT `line_lock_fk1` FOREIGN KEY (`workspace_id`) REFERENCES `workspace`(`workspace_id`);
-
-ALTER TABLE `line_lock` ADD CONSTRAINT `line_lock_fk2` FOREIGN KEY (`line_id`) REFERENCES `workspace_line`(`line_id`);
+ALTER TABLE `workspace_updates` ADD CONSTRAINT `workspace_updates_fk0` FOREIGN KEY (`chat_id`) REFERENCES `chat`(`chat_id`);
 
 SET FOREIGN_KEY_CHECKS = 1;
