@@ -43,6 +43,7 @@ DROP TABLE IF EXISTS `workspace_updates`;
 CREATE TABLE `workspace_updates` (
 	`update_id` bigint NOT NULL AUTO_INCREMENT,
 	`chat_id` bigint NOT NULL,
+	`user_id` bigint NOT NULL,
 	`pos` int NOT NULL,
 	`mode` tinyint NOT NULL,
 	`input` varchar(64),
@@ -58,5 +59,7 @@ ALTER TABLE `user` ADD CONSTRAINT `user_fk0` FOREIGN KEY (`chat_id`) REFERENCES 
 ALTER TABLE `workspace` ADD CONSTRAINT `workspace_fk0` FOREIGN KEY (`chat_id`) REFERENCES `chat`(`chat_id`);
 
 ALTER TABLE `workspace_updates` ADD CONSTRAINT `workspace_updates_fk0` FOREIGN KEY (`chat_id`) REFERENCES `chat`(`chat_id`);
+
+ALTER TABLE `workspace_updates` ADD CONSTRAINT `workspace_updates_fk1` FOREIGN KEY (`user_id`) REFERENCES `user`(`user_id`);
 
 SET FOREIGN_KEY_CHECKS = 1;
