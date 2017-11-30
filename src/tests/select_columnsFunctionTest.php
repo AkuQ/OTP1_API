@@ -3,11 +3,11 @@
 namespace StormChat\tests;
 
 use PHPUnit_Framework_TestCase;
-use function StormChat\remap_keys;
+use function StormChat\select_columns;
 
 require_once __DIR__ . '/../autoload.php';
 
-class remap_keysFunctionTest extends PHPUnit_Framework_TestCase
+class selectcolumnsFunctionTest extends PHPUnit_Framework_TestCase
 {
     public function test_pick_indices(){
         $arr = [
@@ -16,7 +16,7 @@ class remap_keysFunctionTest extends PHPUnit_Framework_TestCase
             ['a', 'z', 'e', 'r']
         ];
 
-        $actual = remap_keys($arr, [2, 0]);
+        $actual = select_columns($arr, [2, 0]);
         $expected = [
             ['c', 'a'],
             ['E', 'Q'],
@@ -32,7 +32,7 @@ class remap_keysFunctionTest extends PHPUnit_Framework_TestCase
             ['a' => 'a', 'b' => 'z', 'c' => 'e', 'd' => 'r']
         ];
 
-        $actual = remap_keys($arr, ['c', 'a']);
+        $actual = select_columns($arr, ['c', 'a']);
         $expected = [
             ['c' => 'c', 'a' => 'a',],
             ['c' => 'E', 'a' => 'Q',],
@@ -48,7 +48,7 @@ class remap_keysFunctionTest extends PHPUnit_Framework_TestCase
             ['a' => 'a', 'b' => 'z', 'c' => 'e', 'd' => 'r']
         ];
 
-        $actual = remap_keys($arr, ['c' => 'A', 'a' => 'C']);
+        $actual = select_columns($arr, ['c' => 'A', 'a' => 'C']);
         $expected = [
             ['A' => 'c', 'C' => 'a',],
             ['A' => 'E', 'C' => 'Q',],
@@ -64,7 +64,7 @@ class remap_keysFunctionTest extends PHPUnit_Framework_TestCase
             [7, 8, 9, 'a' => 'a', 'b' => 'z', 'c' => 'e', 'd' => 'r', 'e' => 't', 'f' => 'y', 'g' => '???']
         ];
 
-        $actual = remap_keys($arr, ['g', 2, 'c' => 'A', 'a' => 'C']);
+        $actual = select_columns($arr, ['g', 2, 'c' => 'A', 'a' => 'C']);
         $expected = [
             ['g' => 'g',    3, 'A' => 'c', 'C' => 'a',],
             ['g' => 'U',    6, 'A' => 'E', 'C' => 'Q',],
@@ -76,7 +76,7 @@ class remap_keysFunctionTest extends PHPUnit_Framework_TestCase
     public function test_handles_empty_array(){
         $arr = [];
 
-        $actual = remap_keys($arr, ['g', 2, 'c' => 'A', 'a' => 'C']);
+        $actual = select_columns($arr, ['g', 2, 'c' => 'A', 'a' => 'C']);
         self::assertEquals([], $actual);
     }
 }

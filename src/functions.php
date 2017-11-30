@@ -10,7 +10,7 @@ namespace StormChat;
  *
  * @return array
  */
-function remap_keys(array $array, array $key_map) {
+function select_columns(array $array, array $key_map) {
     $ret = [];
 
     $i = 0;

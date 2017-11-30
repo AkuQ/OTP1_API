@@ -16,7 +16,7 @@ class Controller {
 
     function list_rooms() {
         $rooms = $this->db_handler->get_groups();
-        return remap_keys($rooms, ['name', 'chat_id' => 'id']);
+        return select_columns($rooms, ['name', 'chat_id' => 'id']);
     }
 
     function create_room($name, $password){
@@ -40,12 +40,12 @@ class Controller {
 
     function list_users($chat_id) {
         $users = $this->db_handler->get_chat_users($chat_id);
-        return remap_keys($users, ['name', 'user_id' => 'id']);
+        return select_columns($users, ['name', 'user_id' => 'id']);
     }
 
     function list_messages($chat_id, $since){
         $messages = $this->db_handler->get_messages($since, $chat_id);
-        return remap_keys($messages, ['user_id', 'content' => 'message', 'message_id' => 'id']);
+        return select_columns($messages, ['user_id', 'content' => 'message', 'message_id' => 'id']);
     }
 
     function post_message($user_id, $chat_id, $message) {
@@ -53,4 +53,8 @@ class Controller {
         return $message_id;
     }
 
+    function get_workspace_updates($chat_id, $since) {
+        $updates = $this->db_handler->get_workspace_updates($since, $chat_id);
+
+    }
 }
