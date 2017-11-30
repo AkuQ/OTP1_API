@@ -88,7 +88,7 @@ class DB_Handler
     {
         $connection = $this->connect();
         $updated = date("Y-m-d H:i:s");
-        $sql = "UPDATE user SET chat_id=null, updated='$updated' WHERE user_id='$user_id'";
+        $sql = "UPDATE user SET chat_id=null, updated='$updated', is_online=0 WHERE user_id='$user_id'";
         $connection->query($sql);
         $connection->close();
     }
