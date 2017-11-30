@@ -1,7 +1,6 @@
 ###########
 # REST API
 
-
 POST        /get_time
 HEADER      Content-Type:application/json
 REQUEST     {}
@@ -96,19 +95,74 @@ RESPONSE    "result": <int>
     result: posted message's ID
 
 
+POST        /workspaces/content
+HEADERS     Content-Type:application/json
+REQUEST     {"chat_id": <int>}
+    chat_id: which chat room's workspace text field to get
+RESPONSE    "content": <string>
+    content: The entire text content of workspace
+
+
+POST        /workspaces/updates
+HEADERS     Content-Type:application/json
+REQUEST     {"chat_id": <int>, "since": <int>, "caret_pos": <int>}
+    chat_id: which chat room's workspace
+    since: update ID of the last fetched update
+    caret_pos: requesting user's caret position in workspace
+RESPONSE    "result": {
+                "caret_pos": <int>,
+                "updates": [{
+                    "id": <int>,
+                    "user_id": <int>,
+                    "mode" <string>,
+                    "input": <string>
+                    "len": <int>
+                }]
+            }
+    caret_pos:  new caret position adjusted for fetched updates
+    id:         update ID
+    user_id:    ID of user who committed update
+    mode:       'insert' or 'remove'
+    pos:        where in string to insert/remove (range of removal to left from pos, insert to the right)
+    input:      inputted string if mode is 'insert', or an empty string if mode is 'remove'
+    len:        length of input or removal
+
+
+POST        /workspaces/insert
+HEADERS     Content-Type:application/json
+REQUEST     {"chat_id": <int>, "user_id": <int>, "pos": <int>, "content": <string>}
+    chat_id: which chat room's workspace to edit
+    user_id: who is editing
+    pos: where in workspace text to insert
+    content: the input string
+RESPONSE    "result": <int>
+    result: update ID of the insertion
+
+
+POST        /workspaces/remove
+HEADERS     Content-Type:application/json
+REQUEST     {"chat_id": <int>, "user_id": <int>, "pos": <int>, "len": <int>}
+    chat_id: which chat room's workspace to edit
+    user_id: who is editing
+    pos: where in workspace text to remove
+    len: how many characters (left from pos)
+RESPONSE    "result": <int>
+    result: update ID of the removal
+
+
 
 ##############
 # SOCKETS API:
+
+METHOD      'connection' (handshake)
+PARAMETERS: "query": {"user_id": <int>, "chat_id": <int>, "token": <string>}
+EMITS       'update users'
 
 
 METHOD      'post message'
 PARAMETERS  {"content": <string>}
     content: the message string
 EMITS       'update messages'
-
-
-METHOD      'connect' (automatic)
-EMITS       'update users'
 
 
 METHOD      'disconnect' (automatic)
