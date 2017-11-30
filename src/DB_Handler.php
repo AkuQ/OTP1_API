@@ -96,7 +96,7 @@ class DB_Handler
      * Creates user and returns user id.
      * @return int
      */
-    function create_user($token, $name)
+    function create_user($name, $token)
     {
         $connection = $this->connect();
         $created = date("Y-m-d H:i:s");

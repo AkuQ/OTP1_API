@@ -101,7 +101,7 @@ namespace StormChat\tests {
 
         public function testCreateUser()
         {
-            $return = self::$handler->create_user("randomtoken", "arto");
+            $return = self::$handler->create_user("arto", "randomtoken");
             $result = self::$connection->query("SELECT * FROM user");
             $row = $result->fetch_assoc();
             $this->assertEquals("arto", $row["name"]);
