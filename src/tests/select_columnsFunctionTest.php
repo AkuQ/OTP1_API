@@ -2,12 +2,14 @@
 
 namespace StormChat\tests;
 
+use PHPUnit\Runner\Exception;
+use PHPUnit_Framework_Error_Notice;
 use PHPUnit_Framework_TestCase;
 use function StormChat\select_columns;
 
 require_once __DIR__ . '/../autoload.php';
 
-class selectcolumnsFunctionTest extends PHPUnit_Framework_TestCase
+class select_columnsFunctionTest extends PHPUnit_Framework_TestCase
 {
     public function test_pick_indices(){
         $arr = [
@@ -78,5 +80,40 @@ class selectcolumnsFunctionTest extends PHPUnit_Framework_TestCase
 
         $actual = select_columns($arr, ['g', 2, 'c' => 'A', 'a' => 'C']);
         self::assertEquals([], $actual);
+    }
+
+    public function test_remap_with_missing_keys(){
+        $arr = [
+            ['a' => 'a', 'b' => 'b', 'c' => 'c', 'd' => 'd'],
+            ['a' => 'Q', 'b' => 'W', 'd' => 'R'],
+            ['b' => 'z', 'c' => 'e', 'd' => 'r']
+        ];
+
+        //With substitution:
+        $actual = select_columns($arr, ['c', 'a' => 'C'], true);
+        $expected = [
+            ['c' => 'c', 'C' => 'a',],
+            ['c' => null, 'C' => 'Q',],
+            ['c' => 'e', 'C' => null,]
+        ];
+        self::assertEquals($expected, $actual);
+
+        //Without substitution:
+        $actual = select_columns($arr, ['c', 'a' => 'C'], null);
+        $expected = [
+            ['c' => 'c', 'C' => 'a',],
+            ['C' => 'Q',],
+            ['c' => 'e',]
+        ];
+        self::assertEquals($expected, $actual);
+
+        self::expectException(\Exception::class);
+        //If not allowed:
+        try {
+            select_columns($arr, ['c', 'a' => 'C'], false);
+        }
+        catch (\Exception $e){
+            throw new \Exception($e);
+        }
     }
 }

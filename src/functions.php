@@ -7,10 +7,12 @@ namespace StormChat;
  *
  * @param array $array Source array.
  * @param array $key_map Indexed items are keys that will be picked, associative are mapped source_key => dest_key
+ * @param bool|null $handle_missing Throw error for missing columns if false, substitute with null if true,
+ * leave unset if null.
  *
  * @return array
  */
-function select_columns(array $array, array $key_map) {
+function select_columns(array $array, array $key_map, $handle_missing = false) {
     $ret = [];
 
     $i = 0;
@@ -40,14 +42,22 @@ function select_columns(array $array, array $key_map) {
         if(is_int($read_key))
             $write_key = $write_index_counter++;
         foreach($array as $row_index => $row) {
-            $ret[$row_index][$write_key] = $row[$read_key];
+            if(!isset($row[$read_key]) && $handle_missing !== false) {
+                if($handle_missing === true)
+                    $ret[$row_index][$write_key] = null;
+            }
+            else $ret[$row_index][$write_key] = $row[$read_key];
         }
         $i++;
     }
     if(!$done) {
         do {
             foreach ($array as $row_index => $row) {
-                $ret[$row_index][$write_key] = $row[$read_key];
+                if(!isset($row[$read_key]) && $handle_missing !== false) {
+                    if($handle_missing === true)
+                        $ret[$row_index][$write_key] = null;
+                }
+                else $ret[$row_index][$write_key] = $row[$read_key];
             }
 
         } while ($next($key_map));
