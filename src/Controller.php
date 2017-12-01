@@ -53,8 +53,52 @@ class Controller {
         return $message_id;
     }
 
-    function get_workspace_updates($chat_id, $since) {
-        $updates = $this->db_handler->get_workspace_updates($since, $chat_id);
+    function get_workspace_content($chat_id){
+        $content = $this->db_handler->get_workspace_content($chat_id);
+        return $content;
+    }
 
+    function get_workspace_updates($chat_id, $since, $caret_pos) {
+        $updates = $this->db_handler->get_workspace_updates($since, $chat_id);
+        array_map(function ($row) use (&$caret_pos) {
+            if($row['mode'] == 0) {
+                $row['mode'] = 'insert';
+                $row['len'] = count($row['input']);
+                $caret_pos += ($row['pos'] <= $caret_pos) ? $row['len'] : 0;
+            }
+            else {
+                $row['mode'] = 'remove';
+                $row['len'] = count($row['input']);
+                $row['input'] = '';
+
+                if($row['pos'] <= $caret_pos) {
+                    $caret_pos -= $row['len'];
+                }
+                elseif($row['pos'] - $row['len'] <= $caret_pos) {
+                    $caret_pos = $row['pos'] - $row['len'];
+                }
+            }
+        }, $updates);
+
+        $updates = select_columns($updates, ['user_id', 'mode', 'input', 'len', 'update_id' => 'id']);
+        return ['updates' => $updates, 'caret_pos' => $caret_pos];
+    }
+
+    function workspace_insert($chat_id, $user_id, $pos, $content) {
+        $content = $this->db_handler->get_workspace_content($chat_id);
+        $content = substr($content, 0, $pos) . $content . substr($content, $pos);
+        $this->db_handler->set_workspace_content($chat_id, $content);
+
+        $update_id = $this->db_handler->workspace_insert($chat_id, $user_id, $pos, $content);
+        return $update_id;
+    }
+
+    function workspace_remove($chat_id, $user_id, $pos, $len) {
+        $content = $this->db_handler->get_workspace_content($chat_id);
+        $content = substr($content, 0, $pos - $len) . substr($content, $pos);
+        $this->db_handler->set_workspace_content($chat_id, $content);
+
+        $update_id = $this->db_handler->workspace_remove($chat_id, $user_id, $pos, $len);
+        return $update_id;
     }
 }

@@ -135,6 +135,10 @@ class DB_Handler
         $sql->bind_param("ssss", $name, $hashed, $created, $created);
         $sql->execute();
         $id = $connection->insert_id;
+
+        $sql = $connection->prepare("INSERT INTO workspace (chat_id) VALUES (?)");
+        $sql->bind_param("i", $id); # todo: test workspace creation
+
         $connection->close();
         return $id;
     }
@@ -170,7 +174,6 @@ class DB_Handler
         $id = $connection->insert_id;
         $connection->close();
         return $id;
-
     }
 
     /**
@@ -188,4 +191,58 @@ class DB_Handler
         }
         return $users;
     }
+
+    function get_workspace_content($chat_id) {
+        $connection = $this->connect();
+        $sql = "SELECT * FROM workspace WHERE chat_id=$chat_id";
+        $result = $connection->query($sql);
+        if ($row = $result->fetch_assoc()) {
+            return $row['content'];
+        }
+        else return "";
+    }
+
+    function set_workspace_content($chat_id, $content) {
+        $connection = $this->connect();
+        $sql = "UPDATE workspace SET content='$content' WHERE chat_id=$chat_id";
+        $connection->query($sql);
+        return true;
+    }
+
+    function get_workspace_updates($last_update_id, $chat_id) {
+        $connection = $this->connect();
+        $sql = "SELECT * FROM workspace_updates WHERE chat_id=$chat_id AND update_id > $last_update_id";
+        $updates = [];
+        $result = $connection->query($sql);
+        while ($row = $result->fetch_assoc()) {
+            $updates[] = $row;
+        }
+        return $updates;
+    }
+
+    function workspace_insert($chat_id, $user_id, $pos, $content){
+        $mode = 0;
+
+        $connection = $this->connect();
+        $sql = $connection->prepare("INSERT INTO message (chat_id, user_id, pos, mode, input) VALUES (?, ?, ?, ?, ?)");
+        $sql->bind_param("iiiis", $chat_id, $user_id, $pos, $mode, $content);
+        $sql->execute();
+        $id = $connection->insert_id;
+        $connection->close();
+        return $id;
+    }
+
+    function workspace_remove($chat_id, $user_id, $pos, $len){
+        $mode = 1;
+        $content = str_repeat(' ', $len);
+
+        $connection = $this->connect();
+        $sql = $connection->prepare("INSERT INTO message (chat_id, user_id, pos, mode, input) VALUES (?, ?, ?, ?, ?)");
+        $sql->bind_param("iiiis", $chat_id, $user_id, $pos, $mode, $content);
+        $sql->execute();
+        $id = $connection->insert_id;
+        $connection->close();
+        return $id;
+    }
+
 }
