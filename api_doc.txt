@@ -130,10 +130,11 @@ RESPONSE    "result": {
 
 POST        /workspaces/insert
 HEADERS     Content-Type:application/json
-REQUEST     {"chat_id": <int>, "user_id": <int>, "pos": <int>, "content": <string>}
+REQUEST     {"chat_id": <int>, "user_id": <int>, "pos": <int>, "since": <int>, "input": <string>}
     chat_id: which chat room's workspace to edit
     user_id: who is editing
     pos: where in workspace text to insert
+    since: update ID of the last fetched update
     content: the input string
 RESPONSE    "result": <int>
     result: update ID of the insertion
@@ -141,10 +142,11 @@ RESPONSE    "result": <int>
 
 POST        /workspaces/remove
 HEADERS     Content-Type:application/json
-REQUEST     {"chat_id": <int>, "user_id": <int>, "pos": <int>, "len": <int>}
+REQUEST     {"chat_id": <int>, "user_id": <int>, "pos": <int>, "since": >int>, "len": <int>}
     chat_id: which chat room's workspace to edit
     user_id: who is editing
     pos: where in workspace text to remove
+    since: update ID of the last fetched update
     len: how many characters (left from pos)
 RESPONSE    "result": <int>
     result: update ID of the removal
