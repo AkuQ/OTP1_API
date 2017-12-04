@@ -257,5 +257,71 @@ namespace StormChat\tests {
             $messages = self::$handler->get_messages(4, 1);
             $this->assertEquals(1, count($messages));
         }
+
+
+        public function testSetGetWorkspaceContent() {
+            $expected_content = 'Hello World!';
+
+            self::assertInternalType('int',
+                $chat_id = self::$handler->create_group("ryhmaa", "pw1")
+            );
+            self::assertTrue(
+                self::$handler->set_workspace_content($chat_id, $expected_content)
+            );
+            self::assertEquals($expected_content,
+                self::$handler->get_workspace_content($chat_id)
+            );
+        }
+
+        public function testWorkspaceUpdatesInsertRemoveGet(){
+            self::assertInternalType('int',
+                $chat_id = self::$handler->create_group("ryhmaa", "pw1")
+            );
+            self::assertInternalType('int',
+                $user_id = self::$handler->create_user("aku", "sometoken")
+            );
+
+
+            $updates = [
+                [0, 'Hello'],
+                [strlen('Hello'), 'World'],
+                [strlen('Hello'), '   '],
+                [strlen('Hello   '), 3],
+                [strlen('Hello'), '-'],
+                [strlen('Hello-World'), '!'],
+            ];
+            $update_ids = [
+                self::$handler->workspace_insert($chat_id, $user_id, ...$updates[0]),
+                self::$handler->workspace_insert($chat_id, $user_id, ...$updates[1]),
+                self::$handler->workspace_insert($chat_id, $user_id, ...$updates[2]),
+                self::$handler->workspace_remove($chat_id, $user_id, ...$updates[3]),
+                self::$handler->workspace_insert($chat_id, $user_id, ...$updates[4]),
+                self::$handler->workspace_insert($chat_id, $user_id, ...$updates[5]),
+            ];
+
+            $prev_id = -1;
+            foreach($update_ids as $id) {
+                self::assertInternalType('int', $id);
+                self::assertGreaterThan($prev_id, $id);
+                $prev_id = $id;
+            }
+
+            $expected_updates = [];
+            foreach($updates as $i => $u) {
+                $expected_updates[] = [
+                    'update_id' => (string)$update_ids[$i],
+                    'chat_id' => (string)$chat_id,
+                    'user_id' => (string)$user_id,
+                    'pos' =>  (string)$u[0],
+                    'input' => ($i == 3) ? str_repeat(' ', $u[1]) : $u[1],
+                    'mode' => ($i == 3) ? '1' : '0',
+                ];
+            }
+
+            $actual_updates = self::$handler->get_workspace_updates($chat_id, $update_ids[1]);
+            array_shift($expected_updates);
+            array_shift($expected_updates);
+            self::assertEquals($expected_updates, $actual_updates);
+        }
     }
 }

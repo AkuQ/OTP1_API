@@ -70,7 +70,7 @@ class DB_Handler
         $ret = false;
         if ($row["password"] === $hashed) {
             $updated = date("Y-m-d H:i:s");
-            $sql = "UPDATE user SET chat_id='$chat_id', updated='$updated', is_online=1 WHERE user_id='$user_id'";
+            $sql = "UPDATE `user` SET chat_id='$chat_id', updated='$updated', is_online=1 WHERE user_id='$user_id'";
             $connection->query($sql);
             $ret = true;
         }
@@ -136,6 +136,7 @@ class DB_Handler
 
         $sql = $connection->prepare("INSERT INTO workspace (chat_id) VALUES (?)");
         $sql->bind_param("i", $id); # todo: test workspace creation
+        $sql->execute();
 
         $connection->close();
         return $id;
@@ -206,9 +207,9 @@ class DB_Handler
     function set_workspace_content($chat_id, $content) {
         $connection = $this->connect();
         $sql = "UPDATE workspace SET content='$content' WHERE chat_id=$chat_id";
-        $connection->query($sql);
+        $result = $connection->query($sql);
         $connection->close();
-        return true;
+        return (bool)$result;
     }
 
     function get_workspace_updates($chat_id, $last_update_id) {
@@ -227,9 +228,11 @@ class DB_Handler
         $mode = 0;
 
         $connection = $this->connect();
-        $sql = $connection->prepare("INSERT INTO message (chat_id, user_id, pos, mode, input) VALUES (?, ?, ?, ?, ?)");
+        $sql = $connection->prepare("INSERT INTO workspace_updates (chat_id, user_id, pos, mode, input) VALUES (?, ?, ?, ?, ?)");
+
         $sql->bind_param("iiiis", $chat_id, $user_id, $pos, $mode, $content);
         $sql->execute();
+        echo $connection->error;
         $id = $connection->insert_id;
         $connection->close();
         return $id;
@@ -240,7 +243,7 @@ class DB_Handler
         $content = str_repeat(' ', $len);
 
         $connection = $this->connect();
-        $sql = $connection->prepare("INSERT INTO message (chat_id, user_id, pos, mode, input) VALUES (?, ?, ?, ?, ?)");
+        $sql = $connection->prepare("INSERT INTO workspace_updates (chat_id, user_id, pos, mode, input) VALUES (?, ?, ?, ?, ?)");
         $sql->bind_param("iiiis", $chat_id, $user_id, $pos, $mode, $content);
         $sql->execute();
         $id = $connection->insert_id;
