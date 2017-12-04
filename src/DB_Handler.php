@@ -196,12 +196,20 @@ class DB_Handler
         $connection = $this->connect();
         $sql = "SELECT * FROM workspace WHERE chat_id=$chat_id";
         $result = $connection->query($sql);
-        $ret = "";
+        $content = "";
         if ($row = $result->fetch_assoc()) {
-            $ret = $row['content'];
+            $content = $row['content'];
         }
+
+        $sql = "SELECT MAX(update_id) AS update_id FROM workspace_updates WHERE chat_id=$chat_id";
+        $result = $connection->query($sql);
+        if ($row = $result->fetch_assoc()) {
+            $last_update_id = $row['update_id'];
+        }
+        $last_update_id = isset($last_update_id) ? $last_update_id : 0;
+
         $connection->close();
-        return $ret;
+        return ['content' => $content, 'last_update' => $last_update_id];
     }
 
     function set_workspace_content($chat_id, $content) {

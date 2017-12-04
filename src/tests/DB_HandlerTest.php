@@ -268,7 +268,7 @@ namespace StormChat\tests {
             self::assertTrue(
                 self::$handler->set_workspace_content($chat_id, $expected_content)
             );
-            self::assertEquals($expected_content,
+            self::assertEquals(['content' => $expected_content, 'last_update' => 0],
                 self::$handler->get_workspace_content($chat_id)
             );
         }
