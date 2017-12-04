@@ -48,14 +48,21 @@ $app->post('/', function () {
     return "StormChat API";
 });
 
-$app->post('/users/auth', function (Request $request) use ($app) {
-    $params = $request->request->all();
-    return json_encode(['result' => 1]);
-});
+//$app->post('/users/auth', function (Request $request) use ($app) {
+//    $params = $request->request->all();
+//    return json_encode(['result' => 1]);
+//});
 
 $app->post('/rooms/auth', function (Request $request) use ($app) {
     $params = $request->request->all();
+    if($params['token'] == 'fail')
+        return json_encode(['result' => 0]);
     return json_encode(['result' => 1]);
+
+//    return $app['api_handler']->respond(
+//        $request,
+//        [$app['controller'], 'is_user_in_room']
+//    );
 });
 
 
@@ -121,6 +128,35 @@ $app->post('/messages/post', function (Request $request) use ($app) {
         [$app['controller'], 'post_message']
     );
 });
+
+$app->post('/workspaces/content', function (Request $request) use ($app) {
+    return $app['api_handler']->respond(
+        $request,
+        [$app['controller'], 'get_workspace_content']
+    );
+});
+
+$app->post('/workspaces/updates', function (Request $request) use ($app) {
+    return $app['api_handler']->respond(
+        $request,
+        [$app['controller'], 'get_workspace_updates']
+    );
+});
+
+$app->post('/workspaces/insert', function (Request $request) use ($app) {
+    return $app['api_handler']->respond(
+        $request,
+        [$app['controller'], 'workspace_insert']
+    );
+});
+
+$app->post('/workspaces/remove', function (Request $request) use ($app) {
+    return $app['api_handler']->respond(
+        $request,
+        [$app['controller'], 'workspace_remove']
+    );
+});
+
 
 $app->run();
 
