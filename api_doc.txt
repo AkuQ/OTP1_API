@@ -99,8 +99,9 @@ POST        /workspaces/content
 HEADERS     Content-Type:application/json
 REQUEST     {"chat_id": <int>}
     chat_id: which chat room's workspace text field to get
-RESPONSE    "content": <string>
+RESPONSE     "result": {"content": <string>, "last_update": <int>}
     content: The entire text content of workspace
+    last_update: The update ID of the latest change to content
 
 
 POST        /workspaces/updates
