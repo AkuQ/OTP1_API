@@ -61,23 +61,21 @@ class DB_Handler
      */
     function join_chat($chat_id, $user_id, $password)
     {
-
         $connection = $this->connect();
         $sql = "SELECT password FROM chat WHERE chat_id='$chat_id'";
         $hashed = hash('sha256', $password);
         $result = $connection->query($sql);
 
         $row = $result->fetch_assoc();
+        $ret = false;
         if ($row["password"] === $hashed) {
             $updated = date("Y-m-d H:i:s");
             $sql = "UPDATE user SET chat_id='$chat_id', updated='$updated', is_online=1 WHERE user_id='$user_id'";
             $connection->query($sql);
-            $connection->close();
-
-            return true;
+            $ret = true;
         }
         $connection->close();
-        return false;
+        return $ret;
 
     }
 
@@ -189,6 +187,7 @@ class DB_Handler
         while ($row = $result->fetch_assoc()) {
             $users[] = $row;
         }
+        $connection->close();
         return $users;
     }
 
@@ -196,20 +195,23 @@ class DB_Handler
         $connection = $this->connect();
         $sql = "SELECT * FROM workspace WHERE chat_id=$chat_id";
         $result = $connection->query($sql);
+        $ret = "";
         if ($row = $result->fetch_assoc()) {
-            return $row['content'];
+            $ret = $row['content'];
         }
-        else return "";
+        $connection->close();
+        return $ret;
     }
 
     function set_workspace_content($chat_id, $content) {
         $connection = $this->connect();
         $sql = "UPDATE workspace SET content='$content' WHERE chat_id=$chat_id";
         $connection->query($sql);
+        $connection->close();
         return true;
     }
 
-    function get_workspace_updates($last_update_id, $chat_id) {
+    function get_workspace_updates($chat_id, $last_update_id) {
         $connection = $this->connect();
         $sql = "SELECT * FROM workspace_updates WHERE chat_id=$chat_id AND update_id > $last_update_id";
         $updates = [];
@@ -217,6 +219,7 @@ class DB_Handler
         while ($row = $result->fetch_assoc()) {
             $updates[] = $row;
         }
+        $connection->close();
         return $updates;
     }
 
