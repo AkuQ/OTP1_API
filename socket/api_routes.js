@@ -28,8 +28,18 @@ function leave_room(params, callback) {
     api_call('/rooms/join', params, callback);
 }
 
+function workspace_insert(params, callback) {
+    api_call('/workspaces/insert', params, callback);
+}
+
+function workspace_remove(params, callback) {
+    api_call('/workspaces/remove', params, callback);
+}
+
 exports.post_message = post_message;
 exports.leave_room = leave_room;
+exports.workspace_insert = workspace_insert;
+exports.workspace_remove = workspace_remove;
 
 //AUTH:
 
