@@ -160,11 +160,11 @@ namespace StormChat\tests {
             $date = &FakeDate::$date;
             self::$handler->create_group("ryhmaa", "pw1");
             $date["year"] = "1800";
-            $user_id = self::$handler->create_user("randomtoken", "arto");
+            $user_id = self::$handler->create_user("arto", "randomtoken");
             $date["year"] = "2000";
             $bool = self::$handler->join_chat(1, $user_id, "pw1");
             $this->assertEquals(true, $bool);
-            $result = self::$connection->query("SELECT * FROM user WHERE name='arto'");
+            $result = self::$connection->query("SELECT * FROM `user` WHERE `name`='arto'");
             $row = $result->fetch_assoc();
             $date["year"] = "1800";
             $this->assertEquals(FakeDate::date("Y-m-d H:i:s"), $row["created"]);
@@ -203,13 +203,13 @@ namespace StormChat\tests {
         {
             self::$handler->create_group("ryhmaa", "pw1");
 
-            $user_id = self::$handler->create_user("randomtoken", "arto");
+            $user_id = self::$handler->create_user("arto", "randomtoken");
             self::$handler->join_chat(1, $user_id, "pw1");
 
-            $user_id = self::$handler->create_user("randomtoken", "tuomas");
+            $user_id = self::$handler->create_user("tuomas", "randomtoken");
             self::$handler->join_chat(1, $user_id, "pw1");
 
-            $user_id = self::$handler->create_user("randomtoken", "akseli");
+            $user_id = self::$handler->create_user("akseli", "randomtoken");
             self::$handler->join_chat(1, $user_id, "pw1");
 
             $users = self::$handler->get_chat_users(1);
@@ -227,7 +227,7 @@ namespace StormChat\tests {
         public function testLeaveChat()
         {
             self::$handler->create_group("ryhmaa", "pw1");
-            $user_id = self::$handler->create_user("randomtoken", "arto");
+            $user_id = self::$handler->create_user("arto", "randomtoken");
             self::$handler->join_chat(1, $user_id, "pw1");
             $users = self::$handler->get_chat_users(1);
             $this->assertEquals("arto", $users[0]["name"]);
@@ -239,7 +239,7 @@ namespace StormChat\tests {
         public function testGetMessages()
         {
             self::$handler->create_group("ryhmaa", "pw1");
-            $return = self::$handler->create_user("randomtoken", "arto");
+            $return = self::$handler->create_user("arto", "randomtoken");
             self::$handler->join_chat(1, $return["id"], "pw1");
             self::$handler->post_message(1, 1, "Hello world");
             self::$handler->post_message(1, 1, "dlrow elloH");
