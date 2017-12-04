@@ -8,14 +8,18 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 use PHPUnit_Framework_TestCase;
 use StormChat\Controller;
 use StormChat\DB_Handler;
+use function StormChat\select_columns;
 
 class ControllerTest extends PHPUnit_Framework_TestCase
 {
+    ////////
+    //SETUP:
 
     /** @var DB_Handler|\PHPUnit_Framework_MockObject_MockObject */
     private static $handler = null;
     /** @var Controller */
     private static $controller = null;
+
 
     public function setUp()
     {
@@ -28,6 +32,9 @@ class ControllerTest extends PHPUnit_Framework_TestCase
         self::$controller = new Controller(self::$handler);
     }
 
+    ///////
+    //TEST:
+
     public function test_create_user() {
         self::$handler->method('create_user')->willReturn(1);
         $actual =  self::$controller->create_user("artsi");
@@ -35,13 +42,14 @@ class ControllerTest extends PHPUnit_Framework_TestCase
         $this->assertJson(json_encode($actual["token"]));  # i.e. AssertIsEncodableInJSON
     }
 
-
-    public function test_get_user() {
-        self::$handler->method('get_user')->willReturn(1);
-        $actual =  self::$controller->create_user("artsi");
-        $this->assertEquals(1, $actual["id"]);
-        $this->assertJson(json_encode($actual["token"]));  # i.e. AssertIsEncodableInJSON
-    }
+// TODO:
+//    public function test_get_user() {
+//        self::$handler->method('get_user')->willReturn(['user_id' => ]);
+//        $actual =  self::$controller->get_user("artsi");
+//        var_dump($actual);
+//        $this->assertEquals(1, $actual["id"]);
+//        $this->assertJson(json_encode($actual["token"]));  # i.e. AssertIsEncodableInJSON
+//    }
 
     public function test_is_user_in_room() {
         self::$handler->method('get_user')->willReturn(
@@ -110,4 +118,148 @@ class ControllerTest extends PHPUnit_Framework_TestCase
         $actual =  self::$controller->join_room(1, 1, "passw");
         self::assertEquals(1, $actual);
     }
+
+    public function test_get_workspace_content(){
+        $chat_id = 101;
+        $expected = 'this is a text';
+        self::$handler->method('get_workspace_content')->with($chat_id)->willReturn($expected);
+        $actual = self::$controller->get_workspace_content($chat_id);
+        self::assertEquals($expected, $actual);
+    }
+
+    public function test_get_workspace_update_inserts(){
+        $chat_id = 1;
+        $since = 5;
+        $client_content = 'The quick brown fox jumps over the lazy dog.';
+        $client_caret_pos = strpos($client_content, 'over');
+
+        $pos_very = strpos($client_content, 'quick');
+        $pos_too = strlen('very ') + strpos($client_content, 'lazy');
+
+        $updates = [
+            ['update_id' => 10, 'pos' => $pos_very, 'input' => 'very ', 'mode' => 0, 'user_id' => 2],
+            ['update_id' => 12, 'pos' => $pos_too,  'input' => 'too ',  'mode' => 0, 'user_id' => 3],
+        ];
+        self::$handler->method('get_workspace_updates')->with($chat_id, $since)->willReturn($updates);
+
+        //Test that test properly formed:
+        $expected = 'The very quick brown fox jumps ^over the too lazy dog.';
+        $actual = $client_content;
+        $actual = substr($actual, 0, $pos_very) . 'very ' . substr($actual, $pos_very);
+        $actual = substr($actual, 0, $pos_too) . 'too ' . substr($actual, $pos_too);
+        $expected_caret_pos = strpos($expected, '^');
+        $actual = substr($actual, 0, $expected_caret_pos) . '^' . substr($actual, $expected_caret_pos);
+        self::assertEquals($expected, $actual);
+
+        //Test actual return values:
+        $result = self::$controller->get_workspace_updates($chat_id, $since, $client_caret_pos);
+        self::assertEquals($expected_caret_pos, $result['caret_pos'] );
+
+        $expected_updates = $updates;
+        foreach ($expected_updates as &$row) {
+            $row['id'] = $row['update_id'];
+            unset($row['update_id']);
+            $row['mode'] = 'insert';
+            $row['len'] = strlen($row['input']);
+        }
+        self::assertEquals($expected_updates, $result['updates']);
+    }
+
+
+    public function test_get_workspace_update_removals(){
+        $chat_id = 1;
+        $since = 5;
+        $client_content = 'The quick brown fox jumps over the lazy dog.';
+        $client_caret_pos = strpos($client_content, 'er the');
+
+        $len_quick = strlen(' quick');
+        $len_over = strlen(' over');
+        $len_lazy = strlen(' lazy');
+
+        $pos_quick = strpos($client_content, ' brown');
+        $pos_over = -$len_quick + strpos($client_content, ' the lazy');
+        $pos_lazy = -$len_quick - $len_over + strpos($client_content, ' dog.');
+
+        $updates = [
+            ['update_id' => 10, 'pos' => $pos_quick, 'input' => str_repeat(' ', $len_quick), 'mode' => 1, 'user_id' => 2],
+            ['update_id' => 12, 'pos' => $pos_over,  'input' => str_repeat(' ', $len_over),  'mode' => 1, 'user_id' => 3],
+            ['update_id' => 12, 'pos' => $pos_lazy,  'input' => str_repeat(' ', $len_lazy),  'mode' => 1, 'user_id' => 4],
+        ];
+        self::$handler->method('get_workspace_updates')->with($chat_id, $since)->willReturn($updates);
+
+        //Test that test properly formed:
+        $expected = 'The brown fox jumps^ the dog.';
+        $actual = $client_content;
+        $actual = substr($actual, 0, $pos_quick - $len_quick) . substr($actual, $pos_quick);
+        $actual = substr($actual, 0, $pos_over - $len_over) . substr($actual, $pos_over);
+        $actual = substr($actual, 0, $pos_lazy - $len_lazy) . substr($actual, $pos_lazy);
+        $expected_caret_pos = strpos($expected, '^');
+        $actual = substr($actual, 0, $expected_caret_pos) . '^' . substr($actual, $expected_caret_pos);
+        self::assertEquals($expected, $actual);
+
+        //Test actual return values:
+        $result = self::$controller->get_workspace_updates($chat_id, $since, $client_caret_pos);
+        self::assertEquals($expected_caret_pos, $result['caret_pos'] );
+
+        $expected_updates = $updates;
+        foreach ($expected_updates as &$row) {
+            $row['id'] = $row['update_id'];
+            unset($row['update_id']);
+            $row['mode'] = 'remove';
+            $row['len'] = strlen($row['input']);
+            $row['input'] = '';
+        }
+        self::assertEquals($expected_updates, $result['updates']);
+    }
+
+    public function test_workspace_insert_with_differing_caret_pos(){
+        $user_id = 1;
+        $chat_id = 1;
+        $since = 5;
+        $input = ' too';
+        $original_content = 'The quick brown fox jumps over the lazy dog.';
+//        $client_content   = 'The quick brown fox jumps over the too lazy dog.';
+        $server_content   = 'The very quick brown fox jumps over the lazy dog.';
+        $expected_content = 'The very quick brown fox jumps over the too lazy dog.';
+        $client_input_pos = strpos($original_content, ' lazy dog');
+        $server_input_pos = strpos($server_content, ' lazy dog');
+
+        $pos_very = strpos($original_content, 'quick');
+        $updates = [
+            ['update_id' => 10, 'pos' => $pos_very, 'input' => ' very', 'mode' => 0, 'user_id' => 2],
+        ];
+        self::$handler->method('get_workspace_updates')->with($chat_id, $since)->willReturn($updates);
+        self::$handler->method('get_workspace_content')->with($chat_id)->willReturn($server_content);
+        self::$handler->method('workspace_insert')->with($chat_id, $user_id, $server_input_pos, $input)->willReturn(15);
+        self::$handler->method('set_workspace_content')->with($chat_id, $expected_content)->willReturn(true);
+
+        $update_id = self::$controller->workspace_insert($chat_id, $user_id, $client_input_pos, $since, $input);
+        self::assertEquals(15, $update_id);
+    }
+
+    public function test_workspace_removal_with_differing_caret_pos(){
+        $user_id = 1;
+        $chat_id = 1;
+        $since = 5;
+        $len = strlen('az');
+        $original_content = 'The quick brown fox jumps over the lazy dog.';
+//        $client_content   = 'The quick brown fox jumps over the dog.';
+        $server_content   = 'The brown fox jumps over the lazy dog.';
+        $expected_content = 'The brown fox jumps over the ly dog.';
+        $client_input_pos = strpos($original_content, 'y dog');
+        $server_input_pos = strpos($server_content, 'y dog');
+
+        $pos_very = strpos($original_content, 'quick');
+        $updates = [
+            ['update_id' => 10, 'pos' => $pos_very, 'input' => 'quick ', 'mode' => 1, 'user_id' => 2],
+        ];
+        self::$handler->method('get_workspace_updates')->with($chat_id, $since)->willReturn($updates);
+        self::$handler->method('get_workspace_content')->with($chat_id)->willReturn($server_content);
+        self::$handler->method('workspace_remove')->with($chat_id, $user_id, $server_input_pos, $len)->willReturn(15);
+        self::$handler->method('set_workspace_content')->with($chat_id, $expected_content)->willReturn(true);
+
+        $update_id = self::$controller->workspace_remove($chat_id, $user_id, $client_input_pos, $since, $len);
+        self::assertEquals(15, $update_id);
+    }
+
 }
