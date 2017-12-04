@@ -167,5 +167,16 @@ PARAMETERS  {"content": <string>}
 EMITS       'update messages'
 
 
+METHOD      'edit workspace'
+PARAMETERS  {"pos": <int>, "since": <int>, "insert": <string>, "remove": <int>}
+        pos: where in workspace text to insert/remove
+        since: update ID of the last fetched update
+        insert*: the input string
+        remove*: how many characters to remove (left from pos)
+EMITS       'update workspace'
+FOOTNOTES
+    *Optional if the other (insert/remove) is set. If both are set, remove is ignored.
+
+
 METHOD      'disconnect' (automatic)
 EMITS       'update users'
