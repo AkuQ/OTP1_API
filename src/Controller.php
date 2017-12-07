@@ -69,7 +69,7 @@ class Controller {
         $updates = $this->db_handler->get_workspace_updates($chat_id, $since);
         $pos = $this->get_caret_pos($pos, $updates);
 
-        $content = $this->db_handler->get_workspace_content($chat_id);
+        $content = $this->db_handler->get_workspace_content($chat_id)['content'];
         $content = substr($content, 0, $pos) . $input . substr($content, $pos);
         $this->db_handler->set_workspace_content($chat_id, $content);
 
@@ -81,7 +81,7 @@ class Controller {
         $updates = $this->db_handler->get_workspace_updates($chat_id, $since);
         $pos = $this->get_caret_pos($pos, $updates);
 
-        $content = $this->db_handler->get_workspace_content($chat_id);
+        $content = $this->db_handler->get_workspace_content($chat_id)['content'];
         $content = substr($content, 0, $pos - $len) . substr($content, $pos);
         $this->db_handler->set_workspace_content($chat_id, $content);
 

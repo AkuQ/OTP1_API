@@ -104,7 +104,6 @@ class ControllerTest extends PHPUnit_Framework_TestCase
         self::assertEquals(4, $actual[1]["id"]);
         self::assertEquals("dlrow olleH", $actual[1]["message"]);
         self::assertEquals(2, $actual[1]["user_id"]);
-
     }
 
     public function test_post_message() {
@@ -121,7 +120,7 @@ class ControllerTest extends PHPUnit_Framework_TestCase
 
     public function test_get_workspace_content(){
         $chat_id = 101;
-        $expected = 'this is a text';
+        $expected = ['content' => 'this is a text', 'last_update_id' => 111];
         self::$handler->method('get_workspace_content')->with($chat_id)->willReturn($expected);
         $actual = self::$controller->get_workspace_content($chat_id);
         self::assertEquals($expected, $actual);
@@ -229,7 +228,9 @@ class ControllerTest extends PHPUnit_Framework_TestCase
             ['update_id' => 10, 'pos' => $pos_very, 'input' => ' very', 'mode' => 0, 'user_id' => 2],
         ];
         self::$handler->method('get_workspace_updates')->with($chat_id, $since)->willReturn($updates);
-        self::$handler->method('get_workspace_content')->with($chat_id)->willReturn($server_content);
+        self::$handler->method('get_workspace_content')->with($chat_id)->willReturn(
+            ['content' => $server_content, 'last_update' => 10]
+        );
         self::$handler->method('workspace_insert')->with($chat_id, $user_id, $server_input_pos, $input)->willReturn(15);
         self::$handler->method('set_workspace_content')->with($chat_id, $expected_content)->willReturn(true);
 
@@ -254,7 +255,9 @@ class ControllerTest extends PHPUnit_Framework_TestCase
             ['update_id' => 10, 'pos' => $pos_very, 'input' => 'quick ', 'mode' => 1, 'user_id' => 2],
         ];
         self::$handler->method('get_workspace_updates')->with($chat_id, $since)->willReturn($updates);
-        self::$handler->method('get_workspace_content')->with($chat_id)->willReturn($server_content);
+        self::$handler->method('get_workspace_content')->with($chat_id)->willReturn(
+            ['content' => $server_content, 'last_update' => 10]
+        );
         self::$handler->method('workspace_remove')->with($chat_id, $user_id, $server_input_pos, $len)->willReturn(15);
         self::$handler->method('set_workspace_content')->with($chat_id, $expected_content)->willReturn(true);
 
