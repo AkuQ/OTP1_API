@@ -44,7 +44,7 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('post message', function (msg) {
-        api.post_message({user_id: user_id, chat_id: chat_id, msg: msg.content}, function (result) {
+        api.post_message({user_id: user_id, chat_id: chat_id, message: msg.content}, function (result) {
             if (result.result === 1)
                 console.log(socket.id + ': ' + user_id + ' sent  ' + msg.content);
                 io.to(chat_id).emit('update messages');
