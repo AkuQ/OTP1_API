@@ -58,7 +58,7 @@ class Controller {
         return $content;
     }
 
-    public function get_workspace_updates($chat_id, $since, $caret_pos) {
+    public function get_workspace_updates($chat_id, $since=0, $caret_pos=0) {
         $updates = $this->db_handler->get_workspace_updates($chat_id, $since);
         $caret_pos = $this->get_caret_pos($caret_pos, $updates);
         $updates = select_columns($updates, ['user_id', 'mode', 'pos', 'input', 'len', 'update_id' => 'id']);
@@ -67,7 +67,7 @@ class Controller {
 
     public function workspace_insert($chat_id, $user_id, $pos, $since, $input) {
         $updates = $this->db_handler->get_workspace_updates($chat_id, $since);
-        $pos = $this->get_caret_pos($pos, $updates);
+        $pos = $this->get_caret_pos($pos, $updates, $user_id);
 
         $content = $this->db_handler->get_workspace_content($chat_id)['content'];
         $content = substr($content, 0, $pos) . $input . substr($content, $pos);
@@ -79,7 +79,7 @@ class Controller {
 
     public function workspace_remove($chat_id, $user_id, $pos, $since, $len) {
         $updates = $this->db_handler->get_workspace_updates($chat_id, $since);
-        $pos = $this->get_caret_pos($pos, $updates);
+        $pos = $this->get_caret_pos($pos, $updates, $user_id);
 
         $content = $this->db_handler->get_workspace_content($chat_id)['content'];
         $content = substr($content, 0, $pos - $len) . substr($content, $pos);
@@ -93,9 +93,12 @@ class Controller {
     ///////////
     //HELPERS:
 
-    private static function get_caret_pos($caret_pos, array &$inout_updates){
+    private static function get_caret_pos($caret_pos, array &$inout_updates, $user_id=0){
         foreach ($inout_updates as &$row) {
-            if($row['mode'] == 0) {
+            if($user_id == $row['user_id']) {
+                continue;
+            }
+            elseif($row['mode'] == 0) {
                 $row['mode'] = 'insert';
                 $row['len'] = strlen($row['input']);
                 $caret_pos += ($row['pos'] <= $caret_pos) ? $row['len'] : 0;
@@ -103,7 +106,6 @@ class Controller {
             else {
                 $row['mode'] = 'remove';
                 $row['len'] = strlen($row['input']);
-                $row['input'] = '';
 
                 if($row['pos'] <= $caret_pos) {
                     $caret_pos -= $row['len'];
@@ -111,6 +113,7 @@ class Controller {
                 elseif($row['pos'] - $row['len'] <= $caret_pos) {
                     $caret_pos = $row['pos'] - $row['len'];
                 }
+                $row['input'] = '';
             }
         } unset($row);
         return $caret_pos;
