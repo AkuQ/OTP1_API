@@ -27,20 +27,24 @@ io.sockets.on('connection', function (socket) {
     io.to(chat_id).emit('update users');
 
     socket.on('edit workspace', function (update) {
-        var api_workspace_edit = (update.insert) ? api.workspace_insert : api.workspace_remove;
-
-        var $params = {
-            user_id: user_id,
-            chat_id: chat_id,
-            pos: update.pos,
-            since: update.since,
-            input: update.input,
-            len: update.len,
-        };
-
-        api_workspace_edit( $params, function () {
-            io.to(chat_id).emit('update workspace');
-        });
+        if (update.insert) {
+            api.workspace_insert({
+                user_id: user_id,
+                chat_id: chat_id,
+                pos: update.pos,
+                since: update.since,
+                content: update.insert
+            },function () { io.to(chat_id).emit('update workspace');} );
+        }
+        else if(update.remove){
+            api.workspace_remove({
+                user_id: user_id,
+                chat_id: chat_id,
+                pos: update.pos,
+                since: update.since,
+                len: update.remove
+            },function () { io.to(chat_id).emit('update workspace');} );
+        }
     });
 
     socket.on('post message', function (msg) {
