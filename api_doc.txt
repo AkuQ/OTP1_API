@@ -85,7 +85,7 @@ RESPONSE    "result":
     message: message content
 
 
-POST        /messages/post
+POST        /messages/post*
 HEADERS     Content-Type:application/json
 REQUEST     {"user_id": <int>, "chat_id": <int>, "message": <string>}
     user_id: posting user's ID
@@ -93,6 +93,8 @@ REQUEST     {"user_id": <int>, "chat_id": <int>, "message": <string>}
     message: message content
 RESPONSE    "result": <int>
     result: posted message's ID
+FOOTNOTES
+    *If sockets are used, then this should be ignored (use "post message" socket call instead)
 
 
 POST        /workspaces/content
@@ -129,7 +131,7 @@ RESPONSE    "result": {
     len:        length of input or removal
 
 
-POST        /workspaces/insert
+POST        /workspaces/insert*
 HEADERS     Content-Type:application/json
 REQUEST     {"chat_id": <int>, "user_id": <int>, "pos": <int>, "since": <int>, "input": <string>}
     chat_id: which chat room's workspace to edit
@@ -139,9 +141,11 @@ REQUEST     {"chat_id": <int>, "user_id": <int>, "pos": <int>, "since": <int>, "
     content: the input string
 RESPONSE    "result": <int>
     result: update ID of the insertion
+FOOTNOTES
+    *If sockets are used, then this should be ignored (use "edit workspace" socket call instead)
 
 
-POST        /workspaces/remove
+POST        /workspaces/remove*
 HEADERS     Content-Type:application/json
 REQUEST     {"chat_id": <int>, "user_id": <int>, "pos": <int>, "since": >int>, "len": <int>}
     chat_id: which chat room's workspace to edit
@@ -151,7 +155,8 @@ REQUEST     {"chat_id": <int>, "user_id": <int>, "pos": <int>, "since": >int>, "
     len: how many characters (left from pos)
 RESPONSE    "result": <int>
     result: update ID of the removal
-
+FOOTNOTES
+    *If sockets are used, then this should be ignored (use "edit workspace" socket call instead)
 
 
 ##############
